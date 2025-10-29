@@ -1,23 +1,8 @@
 <template>
-  <div class="contact-container">
-    <!-- Navigation -->
-    <nav class="navbar">
-      <div class="nav-content">
-        <div class="logo">
-          <span class="logo-text">GK</span>
-        </div>
-        <div class="nav-links">
-          <router-link to="/" class="nav-link">Home</router-link>
-          <router-link to="/projects" class="nav-link">Projects</router-link>
-          <router-link to="/contact" class="nav-link active">Contact</router-link>
-          <router-link to="/admin" class="nav-link">Admin</router-link>
-        </div>
-      </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section class="contact-hero">
-      <div class="hero-content">
+  <AppLayout>
+    <div class="contact-container">
+      <!-- Header -->
+      <div class="contact-header">
         <h1 class="hero-title">
           <span class="title-line">Let's Build</span>
           <span class="title-line gradient-text">Something Amazing</span>
@@ -26,22 +11,22 @@
           I'm always excited to work on innovative projects. Whether you have a specific need or just want to chat about technology, I'm here to help.
         </p>
       </div>
-    </section>
 
-    <!-- Contact Section -->
-    <section class="contact-section">
-      <div class="contact-grid">
-        <!-- Contact Form -->
-        <div class="contact-form-wrapper">
+      <!-- Main Content Grid -->
+      <div class="contact-main-grid">
+        <!-- Contact Form Section -->
+        <div class="form-section">
+          <div class="section-title">
+            <h2>Get In Touch</h2>
+          </div>
           <ContactForm />
         </div>
 
-        <!-- Contact Info -->
-        <div class="contact-info">
-          <h2 class="info-title">Let's Connect</h2>
-          <p class="info-description">
-            Ready to start your next project? Reach out through any of these channels:
-          </p>
+        <!-- Contact Info Section -->
+        <div class="info-section">
+          <div class="section-title">
+            <h2>Connect With Me</h2>
+          </div>
 
           <div class="contact-methods">
             <div class="contact-method">
@@ -72,7 +57,7 @@
               <div class="method-icon">🌍</div>
               <div class="method-info">
                 <h3>Location</h3>
-                <p>Available for remote work worldwide</p>
+                <p>Remote work worldwide</p>
               </div>
             </div>
           </div>
@@ -85,63 +70,51 @@
               <p>Usually within 24 hours</p>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
 
-    <!-- Skills Highlight -->
-    <section class="skills-highlight">
-      <h2 class="section-title">What I Can Help With</h2>
-      <div class="skills-grid">
-        <div class="skill-item">
-          <div class="skill-icon">🐘</div>
-          <h3>PHP/Laravel</h3>
-          <p>Custom web applications, APIs, CMS</p>
-        </div>
-        <div class="skill-item">
-          <div class="skill-icon">💚</div>
-          <h3>Vue.js/React</h3>
-          <p>Modern SPAs, dashboards, UI components</p>
-        </div>
-        <div class="skill-item">
-          <div class="skill-icon">📱</div>
-          <h3>Flutter</h3>
-          <p>Cross-platform mobile apps</p>
-        </div>
-        <div class="skill-item">
-          <div class="skill-icon">🐍</div>
-          <h3>Python</h3>
-          <p>Data processing, automation, AI/ML</p>
-        </div>
-        <div class="skill-item">
-          <div class="skill-icon">🎮</div>
-          <h3>Unity</h3>
-          <p>2D/3D games, AR/VR experiences</p>
-        </div>
-        <div class="skill-item">
-          <div class="skill-icon">☁️</div>
-          <h3>Cloud & DevOps</h3>
-          <p>AWS, Docker, CI/CD pipelines</p>
+          <!-- Skills -->
+          <div class="skills-section">
+            <h3>Skills & Expertise</h3>
+            <div class="skills-grid">
+              <div class="skill-item">
+                <div class="skill-icon">🐘</div>
+                <h4>PHP/Laravel</h4>
+              </div>
+              <div class="skill-item">
+                <div class="skill-icon">💚</div>
+                <h4>Vue.js/React</h4>
+              </div>
+              <div class="skill-item">
+                <div class="skill-icon">📱</div>
+                <h4>Flutter</h4>
+              </div>
+              <div class="skill-item">
+                <div class="skill-icon">🐍</div>
+                <h4>Python</h4>
+              </div>
+              <div class="skill-item">
+                <div class="skill-icon">🎮</div>
+                <h4>Unity</h4>
+              </div>
+              <div class="skill-item">
+                <div class="skill-icon">☁️</div>
+                <h4>Cloud & DevOps</h4>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </section>
 
-    <!-- Call to Action -->
-    <section class="cta-section">
-      <div class="cta-content">
-        <h2>Ready to Start Your Project?</h2>
-        <p>Let's discuss how I can help bring your ideas to life.</p>
-        <div class="cta-buttons">
-          <router-link to="/projects" class="btn-primary">View My Work</router-link>
-          <a href="#contact-form" class="btn-secondary">Get In Touch</a>
-        </div>
+      <!-- Bottom CTA -->
+      <div class="bottom-cta">
+        <router-link to="/projects" class="btn-primary">View My Work</router-link>
       </div>
-    </section>
-  </div>
+    </div>
+  </AppLayout>
 </template>
 
 <script setup>
 import { onMounted } from 'vue'
+import AppLayout from '../components/AppLayout.vue'
 import ContactForm from '../components/ContactForm.vue'
 
 onMounted(() => {
@@ -150,94 +123,27 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* Single Page Contact Container */
 .contact-container {
   min-height: 100vh;
-  background: var(--gradient-secondary);
-}
-
-/* Navigation */
-.navbar {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 1000;
-  background: rgba(10, 10, 10, 0.8);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--color-border-primary);
-}
-
-.nav-content {
-  max-width: 1200px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
-.logo-text {
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-weight: bold;
-  font-size: 1.5rem;
-}
-
-.nav-links {
-  display: flex;
-  gap: 2rem;
-}
-
-.nav-link {
-  color: var(--color-text-secondary);
-  text-decoration: none;
-  transition: var(--transition-normal);
-  position: relative;
-  padding: 0.5rem 0;
-}
-
-.nav-link:hover,
-.nav-link.active {
-  color: var(--color-primary);
-}
-
-.nav-link::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: var(--gradient-primary);
-  transition: width var(--transition-normal);
-}
-
-.nav-link:hover::after,
-.nav-link.active::after {
-  width: 100%;
-}
-
-/* Hero Section */
-.contact-hero {
-  padding: 8rem 2rem 4rem;
+/* Compact Header */
+.contact-header {
   text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-content {
-  max-width: 800px;
-  margin: 0 auto;
-  position: relative;
-  z-index: 2;
+  margin-bottom: 2rem;
 }
 
 .hero-title {
-  font-size: clamp(2.5rem, 8vw, 4rem);
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
   font-weight: 900;
   line-height: 1.1;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 .title-line {
@@ -245,7 +151,7 @@ onMounted(() => {
 }
 
 .gradient-text {
-  background: var(--gradient-accent);
+  background: linear-gradient(45deg, #ff00ff, #ffff00);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -258,266 +164,285 @@ onMounted(() => {
 }
 
 .hero-subtitle {
-  font-size: 1.2rem;
-  color: var(--color-text-secondary);
-  line-height: 1.6;
-  max-width: 600px;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+  max-width: 500px;
   margin: 0 auto;
 }
 
-/* Contact Section */
-.contact-section {
-  padding: 4rem 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.contact-grid {
+/* Main Grid Layout */
+.contact-main-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 2rem;
+  flex: 1;
   align-items: start;
 }
 
-.contact-form-wrapper {
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border-primary);
-  border-radius: 15px;
-  padding: 2rem;
-  backdrop-filter: blur(10px);
+/* Section Titles */
+.section-title {
+  margin-bottom: 1.5rem;
 }
 
-.contact-info {
-  padding: 2rem 0;
-}
-
-.info-title {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-  background: var(--gradient-primary);
+.section-title h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(45deg, #00ffff, #ff00ff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.info-description {
-  color: var(--color-text-secondary);
-  line-height: 1.6;
-  margin-bottom: 2rem;
+/* Form Section */
+.form-section {
+  background: rgba(0, 8, 20, 0.8);
+  border: 1px solid rgba(255, 214, 10, 0.2);
+  border-radius: 15px;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+  height: fit-content;
 }
 
-.contact-methods {
+/* Info Section */
+.info-section {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  margin-bottom: 3rem;
+}
+
+/* Compact Contact Methods */
+.contact-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
 }
 
 .contact-method {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border-primary);
-  border-radius: 10px;
-  transition: var(--transition-normal);
+  gap: 0.8rem;
+  padding: 0.8rem;
+  background: rgba(0, 8, 20, 0.8);
+  border: 1px solid rgba(255, 214, 10, 0.2);
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
 .contact-method:hover {
-  border-color: var(--color-border-accent);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(0, 255, 255, 0.1);
+  border-color: rgba(255, 0, 255, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 15px rgba(0, 255, 255, 0.1);
 }
 
 .method-icon {
-  font-size: 1.5rem;
-  width: 50px;
-  height: 50px;
+  font-size: 1.2rem;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--gradient-primary);
+  background: linear-gradient(45deg, #00ffff, #ff00ff);
   border-radius: 50%;
-  color: var(--color-bg-primary);
+  color: #0a0a0a;
+  flex-shrink: 0;
 }
 
 .method-info h3 {
-  color: var(--color-primary);
-  margin-bottom: 0.3rem;
+  color: #00ffff;
+  margin-bottom: 0.2rem;
+  font-size: 0.9rem;
 }
 
 .method-info a,
 .method-info p {
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
-  transition: var(--transition-normal);
+  transition: all 0.3s ease;
+  font-size: 0.85rem;
 }
 
 .method-info a:hover {
-  color: var(--color-primary);
+  color: #00ffff;
 }
 
+/* Compact Response Time */
 .response-time {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1.5rem;
+  gap: 0.8rem;
+  padding: 1rem;
   background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
-  border: 1px solid var(--color-border-accent);
-  border-radius: 10px;
+  border: 1px solid rgba(255, 0, 255, 0.3);
+  border-radius: 8px;
 }
 
 .response-icon {
-  font-size: 2rem;
+  font-size: 1.5rem;
 }
 
 .response-info h3 {
-  color: var(--color-accent);
-  margin-bottom: 0.3rem;
+  color: #ff00ff;
+  margin-bottom: 0.2rem;
+  font-size: 0.9rem;
 }
 
 .response-info p {
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
 }
 
-/* Skills Highlight */
-.skills-highlight {
-  padding: 4rem 2rem;
-  background: rgba(0, 0, 0, 0.3);
-}
-
-.section-title {
-  text-align: center;
-  font-size: 2.5rem;
-  margin-bottom: 3rem;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* Compact Skills Section */
+.skills-section h3 {
+  color: #ffd60a;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
 }
 
 .skills-grid {
-  max-width: 1200px;
-  margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.8rem;
 }
 
 .skill-item {
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border-primary);
-  border-radius: 12px;
-  padding: 2rem;
+  background: rgba(0, 8, 20, 0.8);
+  border: 1px solid rgba(255, 214, 10, 0.2);
+  border-radius: 8px;
+  padding: 0.8rem;
   text-align: center;
-  transition: var(--transition-normal);
+  transition: all 0.3s ease;
   backdrop-filter: blur(10px);
 }
 
 .skill-item:hover {
-  border-color: var(--color-border-accent);
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
+  border-color: rgba(255, 0, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(0, 255, 255, 0.1);
 }
 
 .skill-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  margin-bottom: 0.3rem;
 }
 
-.skill-item h3 {
-  color: var(--color-primary);
-  margin-bottom: 0.5rem;
+.skill-item h4 {
+  color: #00ffff;
+  margin-bottom: 0;
+  font-size: 0.75rem;
 }
 
-.skill-item p {
-  color: var(--color-text-secondary);
-  line-height: 1.5;
-}
-
-/* CTA Section */
-.cta-section {
-  padding: 4rem 2rem;
+/* Bottom CTA */
+.bottom-cta {
   text-align: center;
-  background: rgba(0, 0, 0, 0.5);
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 214, 10, 0.2);
 }
 
-.cta-content h2 {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  background: var(--gradient-accent);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* Button Styles */
+.btn-primary {
+  background: linear-gradient(45deg, #ffd60a, #ff00ff);
+  color: #0a0a0a;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  display: inline-block;
 }
 
-.cta-content p {
-  font-size: 1.2rem;
-  color: var(--color-text-secondary);
-  margin-bottom: 2rem;
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(255, 214, 10, 0.3);
 }
 
-.cta-buttons {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
-}
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
-  .nav-content {
+  .contact-container {
     padding: 1rem;
   }
 
-  .nav-links {
-    gap: 1rem;
+  .contact-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-title {
+    font-size: clamp(1.5rem, 6vw, 2rem);
+  }
+
+  .hero-subtitle {
     font-size: 0.9rem;
   }
 
-  .contact-hero {
-    padding: 6rem 1rem 3rem;
-  }
-
-  .contact-grid {
+  .contact-main-grid {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 1.5rem;
   }
 
-  .contact-form-wrapper {
-    padding: 1.5rem;
+  .form-section {
+    padding: 1rem;
   }
 
-  .skills-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .cta-buttons {
-    flex-direction: column;
-    align-items: center;
+  .section-title h2 {
+    font-size: 1.3rem;
   }
 
   .contact-method {
-    flex-direction: column;
-    text-align: center;
+    padding: 0.6rem;
   }
 
   .method-icon {
-    margin: 0 auto 1rem;
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
+  }
+
+  .method-info h3 {
+    font-size: 0.85rem;
+  }
+
+  .method-info a,
+  .method-info p {
+    font-size: 0.8rem;
+  }
+
+  .skills-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+  }
+
+  .skill-item {
+    padding: 0.6rem;
+  }
+
+  .skill-icon {
+    font-size: 1.2rem;
+  }
+
+  .skill-item h4 {
+    font-size: 0.7rem;
+  }
+
+  .bottom-cta {
+    margin-top: 1.5rem;
   }
 }
+
 
 /* Touch Device Optimization */
 @media (hover: none) and (pointer: coarse) {
   .contact-method:hover,
   .skill-item:hover {
     transform: none;
-  }
-
-  .nav-link::after {
-    display: none;
   }
 }
 </style>

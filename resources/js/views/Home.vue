@@ -1,39 +1,8 @@
 <template>
-  <div class="home-container">
-    <!-- Navigation -->
-    <nav class="navbar">
-      <div class="nav-content">
-        <div class="logo">
-          <span class="logo-text">GK</span>
-        </div>
-        <div class="nav-links">
-          <router-link to="/" class="nav-link active">Work</router-link>
-          <router-link to="/projects" class="nav-link">Projects</router-link>
-          <router-link to="/contact" class="nav-link">Contact</router-link>
-          <router-link to="/admin" class="nav-link">Admin</router-link>
-        </div>
-      </div>
-    </nav>
-
-    <!-- 3D Sci-Fi Building -->
+  <AppLayout>
+    <!-- Space Portfolio -->
     <section class="hero-section">
-      <SciFiBuilding />
-
-      <!-- Minimal text overlay -->
-      <div class="hero-text">
-        <h1 class="hero-title">
-          Ganesh K P
-        </h1>
-        <p class="hero-subtitle">
-          Full-Stack Developer & 3D Specialist
-        </p>
-      </div>
-
-      <!-- Scroll indicator -->
-      <div class="scroll-indicator">
-        <div class="scroll-text">Scroll</div>
-        <div class="scroll-arrow"></div>
-      </div>
+      <SpacePortfolio />
     </section>
 
     <!-- Projects Sections -->
@@ -102,12 +71,13 @@
     <footer class="footer">
       <p>&copy; 2024 Ganesh K P. All rights reserved.</p>
     </footer>
-  </div>
+  </AppLayout>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import SciFiBuilding from '../components/SciFiBuilding.vue'
+import AppLayout from '../components/AppLayout.vue'
+import SpacePortfolio from '../components/SpacePortfolio.vue'
 
 const activeProject = ref(null)
 
@@ -175,83 +145,12 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.home-container {
-  min-height: 100vh;
-  background: #0a0a0a;
-  color: #ffffff;
-  overflow-x: hidden;
-}
-
-/* Navigation */
-.navbar {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 1000;
-  background: rgba(10, 10, 10, 0.8);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 1rem 0;
-}
-
-.nav-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.logo-text {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #ffffff;
-}
-
-.nav-links {
-  display: flex;
-  gap: 2rem;
-}
-
-.nav-link {
-  color: rgba(255, 255, 255, 0.8);
-  text-decoration: none;
-  transition: all 0.3s ease;
-  position: relative;
-  padding: 0.5rem 0;
-  font-size: 0.9rem;
-}
-
-.nav-link:hover,
-.nav-link.active {
-  color: #00ffff;
-}
-
-.nav-link::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: #00ffff;
-  transition: width 0.3s ease;
-}
-
-.nav-link:hover::after,
-.nav-link.active::after {
-  width: 100%;
-}
-
 /* Hero Section */
 .hero-section {
   position: relative;
   height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   overflow: hidden;
+  background: radial-gradient(ellipse at center, #001d3d 0%, #000814 100%);
 }
 
 .hero-text {
@@ -301,7 +200,7 @@ onMounted(() => {
 .scroll-arrow {
   width: 1px;
   height: 30px;
-  background: linear-gradient(to bottom, transparent, #00ffff);
+  background: linear-gradient(to bottom, transparent, #ffd60a);
   position: relative;
 }
 
@@ -314,13 +213,14 @@ onMounted(() => {
   height: 0;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
-  border-top: 8px solid #00ffff;
+  border-top: 8px solid #ffd60a;
 }
 
 /* Projects Section */
 .projects-section {
   padding: 6rem 2rem;
-  background: #0a0a0a;
+  background: linear-gradient(135deg, #000814 0%, #001d3d 50%, #000814 100%);
+  position: relative;
 }
 
 .projects-grid {
@@ -332,23 +232,27 @@ onMounted(() => {
 }
 
 .project-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 8, 20, 0.8);
+  border: 1px solid rgba(255, 214, 10, 0.2);
   border-radius: 8px;
   padding: 2rem;
   position: relative;
   transition: all 0.3s ease;
   cursor: pointer;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .project-card:hover {
-  border-color: rgba(0, 255, 255, 0.3);
+  border-color: rgba(255, 214, 10, 0.5);
   transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(255, 214, 10, 0.2);
 }
 
 .project-card.active {
-  border-color: #00ffff;
-  background: rgba(0, 255, 255, 0.05);
+  border-color: #ffd60a;
+  background: rgba(255, 214, 10, 0.1);
+  box-shadow: 0 4px 20px rgba(255, 214, 10, 0.3);
 }
 
 .project-number {
@@ -357,7 +261,7 @@ onMounted(() => {
   right: 1.5rem;
   font-size: 2rem;
   font-weight: bold;
-  color: rgba(0, 255, 255, 0.2);
+  color: rgba(255, 214, 10, 0.3);
 }
 
 .project-content h3 {
@@ -380,9 +284,9 @@ onMounted(() => {
 }
 
 .tech-tag {
-  background: rgba(0, 255, 255, 0.1);
-  border: 1px solid rgba(0, 255, 255, 0.2);
-  color: #00ffff;
+  background: rgba(255, 214, 10, 0.1);
+  border: 1px solid rgba(255, 214, 10, 0.3);
+  color: #ffd60a;
   padding: 0.3rem 0.8rem;
   border-radius: 4px;
   font-size: 0.8rem;
@@ -408,7 +312,7 @@ onMounted(() => {
   left: 0;
   width: 0;
   height: 1px;
-  background: #00ffff;
+  background: #ffd60a;
   transition: width 0.3s ease;
 }
 
@@ -417,13 +321,14 @@ onMounted(() => {
 }
 
 .project-link:hover {
-  color: #00ffff;
+  color: #ffd60a;
 }
 
 /* About Section */
 .about-section {
   padding: 6rem 2rem;
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
+  background: linear-gradient(135deg, #000814 0%, #001d3d 50%, #000814 100%);
+  position: relative;
 }
 
 .about-content {
@@ -435,7 +340,7 @@ onMounted(() => {
 .section-number {
   font-size: 4rem;
   font-weight: bold;
-  color: rgba(0, 255, 255, 0.2);
+  color: rgba(255, 214, 10, 0.3);
   margin-bottom: 1rem;
 }
 
@@ -462,18 +367,20 @@ onMounted(() => {
 }
 
 .skill-item {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.9);
+  background: rgba(0, 8, 20, 0.8);
+  border: 1px solid rgba(255, 214, 10, 0.2);
+  color: rgba(255, 214, 10, 0.9);
   padding: 0.5rem 1rem;
   border-radius: 20px;
   font-size: 0.9rem;
+  backdrop-filter: blur(10px);
 }
 
 /* Contact Section */
 .contact-section {
   padding: 6rem 2rem;
-  background: #0a0a0a;
+  background: linear-gradient(135deg, #000814 0%, #001d3d 50%, #000814 100%);
+  position: relative;
 }
 
 .contact-content {
@@ -512,7 +419,7 @@ onMounted(() => {
   left: 0;
   width: 0;
   height: 1px;
-  background: #00ffff;
+  background: #ffd60a;
   transition: width 0.3s ease;
 }
 
@@ -521,17 +428,18 @@ onMounted(() => {
 }
 
 .contact-link:hover {
-  color: #00ffff;
+  color: #ffd60a;
 }
 
 /* Footer */
 .footer {
   padding: 2rem;
   text-align: center;
-  background: #0a0a0a;
+  background: linear-gradient(135deg, #000814 0%, #001d3d 50%, #000814 100%);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.5);
   font-size: 0.9rem;
+  position: relative;
 }
 
 /* Mobile Responsiveness */
