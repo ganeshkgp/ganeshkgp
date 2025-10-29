@@ -1,0 +1,286 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* Custom CSS Variables for Dark/Neon Theme */
+:root {
+  /* Primary Colors */
+  --color-primary: #00ffff;
+  --color-secondary: #ff00ff;
+  --color-accent: #ffff00;
+  --color-success: #00ff00;
+  --color-warning: #ff6b6b;
+  --color-error: #ff4444;
+
+  /* Background Colors */
+  --color-bg-primary: #0a0a0a;
+  --color-bg-secondary: #1a1a2e;
+  --color-bg-tertiary: #16213e;
+  --color-bg-card: rgba(255, 255, 255, 0.05);
+  --color-bg-hover: rgba(255, 255, 255, 0.1);
+
+  /* Text Colors */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: rgba(255, 255, 255, 0.8);
+  --color-text-muted: rgba(255, 255, 255, 0.6);
+  --color-text-disabled: rgba(255, 255, 255, 0.4);
+
+  /* Border Colors */
+  --color-border-primary: rgba(255, 255, 255, 0.1);
+  --color-border-secondary: rgba(255, 255, 255, 0.2);
+  --color-border-accent: rgba(0, 255, 255, 0.3);
+
+  /* Shadow Colors */
+  --color-shadow-primary: rgba(0, 255, 255, 0.4);
+  --color-shadow-secondary: rgba(255, 0, 255, 0.3);
+  --color-shadow-accent: rgba(255, 255, 0, 0.3);
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(45deg, var(--color-primary), var(--color-secondary));
+  --gradient-secondary: linear-gradient(135deg, var(--color-bg-secondary), var(--color-bg-tertiary));
+  --gradient-accent: linear-gradient(90deg, var(--color-primary), var(--color-accent), var(--color-secondary));
+
+  /* Animation Timing */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+
+  /* Neon Glow Effect */
+  --neon-glow-primary: 0 0 20px var(--color-primary), 0 0 40px var(--color-primary), 0 0 60px var(--color-primary);
+  --neon-glow-secondary: 0 0 20px var(--color-secondary), 0 0 40px var(--color-secondary);
+  --neon-glow-accent: 0 0 20px var(--color-accent), 0 0 40px var(--color-accent);
+}
+
+/* Global Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--gradient-secondary);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gradient-primary);
+  border-radius: 4px;
+  transition: var(--transition-normal);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gradient-accent);
+}
+
+/* Selection Text */
+::selection {
+  background: var(--color-primary);
+  color: var(--color-bg-primary);
+}
+
+/* Focus Styles */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Link Styles */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: var(--transition-normal);
+}
+
+a:hover {
+  color: var(--color-secondary);
+  text-shadow: 0 0 10px var(--color-primary);
+}
+
+/* Button Styles */
+.btn-primary {
+  background: var(--gradient-primary);
+  color: var(--color-bg-primary);
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-normal);
+  box-shadow: 0 4px 15px var(--color-shadow-primary);
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px var(--color-shadow-primary);
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+  padding: 0.8rem 1.5rem;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-normal);
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-secondary:hover {
+  background: var(--color-primary);
+  color: var(--color-bg-primary);
+  box-shadow: var(--neon-glow-primary);
+  transform: translateY(-2px);
+}
+
+/* Card Styles */
+.card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-primary);
+  border-radius: 12px;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+  transition: var(--transition-normal);
+}
+
+.card:hover {
+  border-color: var(--color-border-accent);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+  transform: translateY(-5px);
+}
+
+/* Neon Text Effects */
+.text-neon-primary {
+  color: var(--color-primary);
+  text-shadow: var(--neon-glow-primary);
+  animation: pulse-glow 2s ease-in-out infinite alternate;
+}
+
+.text-neon-secondary {
+  color: var(--color-secondary);
+  text-shadow: var(--neon-glow-secondary);
+  animation: pulse-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-glow {
+  from {
+    filter: brightness(1);
+  }
+  to {
+    filter: brightness(1.2);
+  }
+}
+
+/* Loading Animation */
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-border-primary);
+  border-top: 3px solid var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 2rem auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Mobile Optimization */
+@media (max-width: 768px) {
+  :root {
+    --transition-fast: 0.1s ease;
+    --transition-normal: 0.2s ease;
+  }
+
+  body {
+    font-size: 14px;
+  }
+
+  .btn-primary, .btn-secondary {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+
+  .card {
+    padding: 1rem;
+    margin: 0.5rem 0;
+  }
+}
+
+/* Touch Device Optimization */
+@media (hover: none) and (pointer: coarse) {
+  .card:hover {
+    transform: none;
+  }
+
+  .btn-primary:hover,
+  .btn-secondary:hover {
+    transform: none;
+  }
+
+  a:hover {
+    text-shadow: none;
+  }
+}
+
+/* Performance Optimization */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  :root {
+    --color-bg-card: rgba(255, 255, 255, 0.1);
+    --color-border-primary: rgba(255, 255, 255, 0.3);
+    --color-text-secondary: rgba(255, 255, 255, 0.9);
+  }
+}
