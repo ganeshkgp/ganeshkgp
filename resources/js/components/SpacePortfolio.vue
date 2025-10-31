@@ -429,7 +429,7 @@ onBeforeUnmount(() => {
 const initSpaceScene = () => {
   // Scene setup
   scene = new THREE.Scene()
-  scene.background = new THREE.Color(0x000814) // Deep space color
+  scene.background = new THREE.Color(0x0a0a0a) // Deep space color - updated to match theme
 
   // Camera setup
   const aspect = sceneContainer.value.clientWidth / sceneContainer.value.clientHeight
@@ -2102,8 +2102,45 @@ const getPopupStarStyle = (index) => {
   height: 100vh;
   position: relative;
   overflow: hidden;
-  background: #000814;
+  background: radial-gradient(ellipse at 20% 30%, rgba(65, 105, 225, 0.15) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 70%, rgba(138, 43, 226, 0.1) 0%, transparent 50%),
+              radial-gradient(ellipse at 50% 50%, rgba(255, 0, 255, 0.05) 0%, transparent 70%),
+              linear-gradient(135deg, #0a0a0a 0%, #1a0033 50%, #000814 100%);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Add animated starfield background */
+.space-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    radial-gradient(2px 2px at 20% 30%, white, transparent),
+    radial-gradient(2px 2px at 60% 70%, white, transparent),
+    radial-gradient(1px 1px at 50% 50%, white, transparent),
+    radial-gradient(1px 1px at 80% 10%, white, transparent),
+    radial-gradient(2px 2px at 90% 60%, white, transparent);
+  background-size: 200% 200%;
+  animation: starfield 120s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes starfield {
+  0% {
+    background-position: 0% 0%, 30% 30%, 60% 60%, 90% 90%, 120% 120%;
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    background-position: 200% 200%, 230% 230%, 260% 260%, 290% 290%, 320% 320%;
+    opacity: 0.8;
+  }
 }
 
 /* Loading Screen */
@@ -2113,7 +2150,7 @@ const getPopupStarStyle = (index) => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #000814 0%, #001d3d 50%, #000814 100%);
+  background: #000000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2154,6 +2191,11 @@ const getPopupStarStyle = (index) => {
   margin-bottom: 1rem;
   z-index: 1;
   position: relative;
+  text-shadow: 0 0 10px rgba(255, 214, 10, 0.5);
+  background: linear-gradient(45deg, #ffd60a, #ff00ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .loading-progress {
@@ -2161,6 +2203,7 @@ const getPopupStarStyle = (index) => {
   font-size: 1.2rem;
   z-index: 1;
   position: relative;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
 }
 
 /* Space Scene */
@@ -2168,6 +2211,7 @@ const getPopupStarStyle = (index) => {
   width: 100%;
   height: 100%;
   position: relative;
+  z-index: 2;
 }
 
 .space-controls-info {
@@ -2271,7 +2315,9 @@ const getPopupStarStyle = (index) => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(ellipse at center, #001d3d 0%, #000814 100%);
+  background: radial-gradient(ellipse at 20% 30%, rgba(65, 105, 225, 0.2) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 70%, rgba(138, 43, 226, 0.15) 0%, transparent 50%),
+              radial-gradient(ellipse at center, #1a0033 0%, #0a0a0a 100%);
 }
 
 .stars-background {
@@ -2485,7 +2531,7 @@ const getPopupStarStyle = (index) => {
 }
 
 .instructions-content {
-  background: rgba(0, 29, 61, 0.9);
+  background: linear-gradient(135deg, rgba(10, 10, 10, 0.9), rgba(26, 0, 51, 0.9));
   border: 2px solid rgba(255, 214, 10, 0.5);
   border-radius: 20px;
   padding: 40px;
@@ -2493,6 +2539,8 @@ const getPopupStarStyle = (index) => {
   text-align: center;
   color: white;
   backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(65, 105, 225, 0.2),
+              0 8px 32px rgba(138, 43, 226, 0.1);
 }
 
 .instruction-icon {

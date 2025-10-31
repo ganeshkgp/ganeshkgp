@@ -10,7 +10,6 @@
           <router-link to="/" class="nav-link">Work</router-link>
           <router-link to="/projects" class="nav-link">Projects</router-link>
           <router-link to="/contact" class="nav-link">Contact</router-link>
-          <router-link to="/admin" class="nav-link">Admin</router-link>
         </div>
       </div>
     </nav>

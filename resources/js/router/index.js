@@ -25,14 +25,7 @@ const routes = [
       title: 'Contact Me | 3D Portfolio'
     }
   },
-  {
-    path: '/admin',
-    name: 'Admin',
-    component: () => import('../views/Admin.vue'),
-    meta: {
-      title: 'Admin Panel | 3D Portfolio'
-    }
-  }
+
 ]
 
 const router = createRouter({

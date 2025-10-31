@@ -113,16 +113,159 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import AppLayout from '../components/AppLayout.vue'
 import ContactForm from '../components/ContactForm.vue'
 
+// Store original overflow settings
+let originalAppStyles = {}
+let originalBodyStyles = {}
+let originalHtmlStyles = {}
+
 onMounted(() => {
-  console.log('Contact page mounted')
+  console.log('Contact page mounted - enabling scrolling')
+
+  // Store original App.vue styles
+  const app = document.getElementById('app')
+  const body = document.body
+  const html = document.documentElement
+
+  if (app) {
+    originalAppStyles = {
+      overflowY: app.style.overflowY,
+      overflowX: app.style.overflowX,
+      height: app.style.height,
+      minHeight: app.style.minHeight
+    }
+  }
+
+  if (body) {
+    originalBodyStyles = {
+      overflowY: body.style.overflowY,
+      overflowX: body.style.overflowX
+    }
+  }
+
+  if (html) {
+    originalHtmlStyles = {
+      overflowY: html.style.overflowY,
+      overflowX: html.style.overflowX
+    }
+  }
+
+  // CRITICAL: Override App.vue overflow settings for Contact page only
+  // Use !important and multiple methods to ensure override works
+  if (app) {
+    app.style.setProperty('overflow-y', 'auto', 'important')
+    app.style.setProperty('overflow-x', 'hidden', 'important')
+    app.style.setProperty('height', 'auto', 'important')
+    app.style.setProperty('min-height', '100vh', 'important')
+    // Fallback for older browsers
+    app.style.overflowY = 'auto'
+    app.style.overflowX = 'hidden'
+    app.style.height = 'auto'
+    app.style.minHeight = '100vh'
+  }
+
+  if (body) {
+    body.style.setProperty('overflow-y', 'auto', 'important')
+    body.style.setProperty('overflow-x', 'hidden', 'important')
+    body.style.overflowY = 'auto'
+    body.style.overflowX = 'hidden'
+  }
+
+  if (html) {
+    html.style.setProperty('overflow-y', 'auto', 'important')
+    html.style.setProperty('overflow-x', 'hidden', 'important')
+    html.style.overflowY = 'auto'
+    html.style.overflowX = 'hidden'
+  }
+
+  // Add a class to body for additional CSS targeting
+  body.classList.add('contact-page-active')
+})
+
+onUnmounted(() => {
+  console.log('Contact page unmounted - restoring original overflow settings')
+
+  // Restore original App.vue overflow settings when leaving Contact page
+  const app = document.getElementById('app')
+  const body = document.body
+  const html = document.documentElement
+
+  // Remove the contact page class
+  body.classList.remove('contact-page-active')
+
+  if (app) {
+    app.style.removeProperty('overflow-y')
+    app.style.removeProperty('overflow-x')
+    app.style.removeProperty('height')
+    app.style.removeProperty('min-height')
+    // Restore original styles
+    app.style.overflowY = originalAppStyles.overflowY || 'hidden'
+    app.style.overflowX = originalAppStyles.overflowX || 'hidden'
+    app.style.height = originalAppStyles.height || '100vh'
+    app.style.minHeight = originalAppStyles.minHeight || ''
+  }
+
+  if (body) {
+    body.style.removeProperty('overflow-y')
+    body.style.removeProperty('overflow-x')
+    body.style.overflowY = originalBodyStyles.overflowY || 'hidden'
+    body.style.overflowX = originalBodyStyles.overflowX || 'hidden'
+  }
+
+  if (html) {
+    html.style.removeProperty('overflow-y')
+    html.style.removeProperty('overflow-x')
+    html.style.overflowY = originalHtmlStyles.overflowY || 'hidden'
+    html.style.overflowX = originalHtmlStyles.overflowX || 'hidden'
+  }
 })
 </script>
 
 <style scoped>
+/* IMPORTANT: Override App.vue overflow settings for Contact page only */
+/* This ensures Contact page can scroll while Home.vue and Projects.vue remain non-scrollable */
+
+/* Multiple approaches to override App.vue overflow settings for Contact page only */
+
+/* Approach 1: Global CSS targeting */
+:global(#app) {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  height: auto !important;
+  min-height: 100vh !important;
+}
+
+:global(body) {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+:global(html) {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* Approach 2: Class-based targeting (more reliable) */
+:global(body.contact-page-active #app) {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  height: auto !important;
+  min-height: 100vh !important;
+}
+
+:global(body.contact-page-active) {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+:global(body.contact-page-active html) {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
 /* Single Page Contact Container */
 .contact-container {
   min-height: 100vh;
@@ -338,6 +481,38 @@ onMounted(() => {
   margin-top: 2rem;
   padding-top: 1.5rem;
   border-top: 1px solid rgba(255, 214, 10, 0.2);
+}
+
+/* Custom Scrollbar for Contact page only */
+:deep(::-webkit-scrollbar) {
+  width: 12px;
+}
+
+:deep(::-webkit-scrollbar-track) {
+  background: rgba(0, 8, 20, 0.8);
+  border-left: 1px solid rgba(255, 214, 10, 0.1);
+}
+
+:deep(::-webkit-scrollbar-thumb) {
+  background: linear-gradient(45deg, rgba(255, 214, 10, 0.6), rgba(255, 0, 255, 0.6));
+  border-radius: 6px;
+  border: 1px solid rgba(255, 214, 10, 0.3);
+  transition: all 0.3s ease;
+}
+
+:deep(::-webkit-scrollbar-thumb:hover) {
+  background: linear-gradient(45deg, rgba(255, 214, 10, 0.8), rgba(255, 0, 255, 0.8));
+  border-color: rgba(255, 214, 10, 0.5);
+}
+
+:deep(::-webkit-scrollbar-corner) {
+  background: rgba(0, 8, 20, 0.8);
+}
+
+/* Firefox scrollbar styling for Contact page only */
+:deep(*) {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 214, 10, 0.6) rgba(0, 8, 20, 0.8);
 }
 
 /* Button Styles */

@@ -1,701 +1,1400 @@
 <template>
   <AppLayout>
-    <!-- Projects Header -->
-    <header class="projects-header">
-      <h1 class="projects-title">Projects Portfolio</h1>
-      <p class="projects-subtitle">Explore my latest work and technical achievements</p>
-    </header>
+    <!-- Space Shooter Game -->
+    <section class="space-game-section">
+      <div class="game-header">
+        <h1 class="game-title">Project Asteroid Field</h1>
 
-    <!-- 3D Iron Man Style Wireframe Sphere -->
-    <section class="scifi-grid-section">
-      <div class="scifi-grid-container" ref="scifiGrid">
-        <!-- Wireframe Sphere Structure -->
-        <div class="wireframe-sphere">
-          <!-- Latitude lines -->
-          <div v-for="i in 8" :key="'lat-' + i"
-               class="wireframe-circle wireframe-latitude"
-               :style="{ transform: `rotateX(${i * 22.5}deg)` }">
+      </div>
+
+      <!-- Game Canvas Container -->
+      <div class="game-container">
+        <canvas id="game-canvas" class="game-canvas"></canvas>
+
+        <!-- Game UI Overlay -->
+        <div class="game-ui">
+          <!-- Health Bar -->
+          <div class="health-bar-container">
+            <div class="health-label">Player Health</div>
+            <div class="health-bar">
+              <div class="health-fill" :style="{ width: (playerHealth / maxHealth) * 100 + '%' }"></div>
+            </div>
           </div>
-          <!-- Longitude lines -->
-          <div v-for="i in 12" :key="'lon-' + i"
-               class="wireframe-circle wireframe-longitude"
-               :style="{ transform: `rotateY(${i * 15}deg)` }">
+
+          <!-- Desktop Controls Info -->
+          <div class="controls-info desktop-only">
+            <div class="control-item">
+              <span class="key">←→</span>
+              <span class="control-desc">Move</span>
+            </div>
+            <div class="control-item">
+              <span class="key">SPACE</span>
+              <span class="control-desc">Shoot</span>
+            </div>
           </div>
-          <!-- Central core -->
-          <div class="sphere-core"></div>
+
+          <!-- Game Over Screen -->
+          <div v-if="gameOver && !victory" class="game-over-screen">
+            <div class="game-over-content">
+              <h2 class="game-over-title">💥 GAME OVER 💥</h2>
+              <p class="game-over-message">Your spaceship was destroyed!</p>
+              <div class="game-over-stats">
+                <div class="stat-row">
+                  <span class="stat-label">Final Score:</span>
+                  <span class="stat-value">{{ score }}</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Projects Discovered:</span>
+                  <span class="stat-value">{{ projectsFound }}/{{ projects.length }}</span>
+                </div>
+              </div>
+              <button @click="restartGame" class="restart-btn">🚀 Play Again</button>
+            </div>
+          </div>
+
+          <!-- Victory Screen -->
+          <div v-if="victory" class="victory-screen">
+            <div class="victory-content">
+              <h2 class="victory-title">🎉 VICTORY! 🎉</h2>
+              <p class="victory-message">All projects discovered!</p>
+              <div class="victory-stats">
+                <div class="stat-row">
+                  <span class="stat-label">Final Score:</span>
+                  <span class="stat-value">{{ score }}</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Projects Discovered:</span>
+                  <span class="stat-value">{{ projectsFound }}/{{ projects.length }}</span>
+                </div>
+              </div>
+              <button @click="restartGame" class="restart-btn">🎮 Play Again</button>
+            </div>
+          </div>
         </div>
 
-        <div class="scifi-grid">
-          <div
-            v-for="(project, index) in projects"
-            :key="project.id"
-            class="scifi-project-card"
-            :class="{ active: expandedProject?.id === project.id, expanded: expandedProject?.id === project.id }"
-            :style="{
-              transform: `translate3d(${getSpherePosition(index).x}px, ${getSpherePosition(index).y}px, ${getSpherePosition(index).z}px) rotateX(${getCardRotation(index).x}deg) rotateY(${getCardRotation(index).y}deg) rotateZ(${getCardRotation(index).z}deg)`,
-              animationDelay: `${index * 0.1}s`,
-              '--icon-color': getProjectColor(project.id),
-              '--curvature': getCardCurvature(index)
-            }"
-            @click="toggleProject(project)"
-          >
-            <!-- Card Frame with Curved Surface -->
-            <div class="scifi-frame">
-              <!-- Curved Surface Effect -->
-              <div class="scifi-curved-surface"></div>
-
-              <!-- Project Icon with 3D effect -->
-              <div class="scifi-icon-container">
-                <div class="scifi-icon-bg" :style="{ backgroundColor: getProjectColor(project.id) }">
-                  <div class="scifi-icon">{{ getProjectIcon(project.id) }}</div>
-                </div>
-                <div class="scifi-icon-glow"></div>
-              </div>
-
-              <!-- Compact View -->
-              <div class="scifi-compact">
-                <h3 class="scifi-project-name">{{ project.name }}</h3>
-                <div class="scifi-tech-compact">
-                  <span v-for="tech in project.technologies.slice(0, 3)" :key="tech" class="scifi-tech-tag">
-                    {{ tech }}
-                  </span>
-                  <span v-if="project.technologies.length > 3" class="scifi-tech-tag more">
-                    +{{ project.technologies.length - 3 }}
-                  </span>
-                </div>
-              </div>
-
-              <!-- Expanded View -->
-              <div class="scifi-expanded" v-if="expandedProject?.id === project.id">
-                <p class="scifi-description">{{ project.description }}</p>
-                <div class="scifi-tech">
-                  <span v-for="tech in project.technologies" :key="tech" class="scifi-tech-tag">
-                    {{ tech }}
-                  </span>
-                </div>
-                <div class="scifi-links">
-                  <a v-if="project.liveUrl" :href="project.liveUrl" target="_blank" class="scifi-link live-link" @click.stop>
-                    <span class="scifi-link-icon">🚀</span> Launch
-                  </a>
-                  <a v-if="project.githubUrl" :href="project.githubUrl" target="_blank" class="scifi-link github-link" @click.stop>
-                    <span class="scifi-link-icon">💻</span> Source
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            <!-- Hover Effects -->
-            <div class="scifi-hover-effect"></div>
-            <div class="scifi-corner-decoration top-left"></div>
-            <div class="scifi-corner-decoration top-right"></div>
-            <div class="scifi-corner-decoration bottom-left"></div>
-            <div class="scifi-corner-decoration bottom-right"></div>
+        <!-- Mobile Controls (outside game-ui) -->
+        <div class="mobile-controls mobile-only">
+          <!-- Left Side - Movement Controls -->
+          <div class="movement-controls left-controls">
+            <button
+              class="mobile-btn move-btn left-btn"
+              @touchstart="handleMobileMoveStart('left')"
+              @touchend="handleMobileMoveEnd('left')"
+              @mousedown="handleMobileMoveStart('left')"
+              @mouseup="handleMobileMoveEnd('left')"
+              @mouseleave="handleMobileMoveEnd('left')"
+            >
+              <span class="btn-icon">←</span>
+            </button>
+            <button
+              class="mobile-btn move-btn right-btn"
+              @touchstart="handleMobileMoveStart('right')"
+              @touchend="handleMobileMoveEnd('right')"
+              @mousedown="handleMobileMoveStart('right')"
+              @mouseup="handleMobileMoveEnd('right')"
+              @mouseleave="handleMobileMoveEnd('right')"
+            >
+              <span class="btn-icon">→</span>
+            </button>
           </div>
+
+          <!-- Right Side - Fire Control -->
+          <div class="fire-controls right-controls">
+            <button
+              class="mobile-btn fire-btn"
+              @touchstart="handleMobileFire"
+              @touchend="handleMobileFireEnd"
+              @mousedown="handleMobileFire"
+              @mouseup="handleMobileFireEnd"
+            >
+              <span class="btn-icon">🔥</span>
+              <span class="btn-label">FIRE</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project Details Modal -->
+      <div v-if="selectedProject" class="project-modal" @click="closeProjectModal">
+        <div class="project-card" @click.stop>
+          <div class="project-header">
+            <h2>{{ selectedProject.name }}</h2>
+            <button class="close-btn" @click="closeProjectModal">&times;</button>
+          </div>
+          <div class="project-content">
+            <img :src="selectedProject.image" :alt="selectedProject.name" class="project-image" />
+            <p class="project-description">{{ selectedProject.description }}</p>
+            <div class="project-tech">
+              <span v-for="tech in selectedProject.technologies" :key="tech" class="tech-tag">{{ tech }}</span>
+            </div>
+            <div class="project-links">
+              <a v-if="selectedProject.live_url" :href="selectedProject.live_url" target="_blank" class="project-link">Live Demo</a>
+              <a v-if="selectedProject.github_url" :href="selectedProject.github_url" target="_blank" class="project-link">GitHub</a>
+              <a v-if="selectedProject.demo_url" :href="selectedProject.demo_url" target="_blank" class="project-link">Demo</a>
+            </div>
+          </div>
+          <button class="resume-btn" @click="resumeGame">Resume Game</button>
         </div>
       </div>
     </section>
-
-    <!-- Project Modal -->
-    <div class="project-modal" :class="{ active: selectedProject }" v-if="selectedProject">
-      <div class="modal-overlay" @click="closeProjectModal"></div>
-      <div class="modal-content">
-        <button class="modal-close" @click="closeProjectModal">×</button>
-        <div class="modal-project-details">
-          <div class="modal-header">
-            <div class="modal-icon" :style="{ backgroundColor: getProjectColor(selectedProject.id) }">
-              {{ getProjectIcon(selectedProject.id) }}
-            </div>
-            <h2>{{ selectedProject.name }}</h2>
-          </div>
-
-          <div class="modal-body">
-            <p class="modal-description">{{ selectedProject.description }}</p>
-
-            <div class="modal-tech">
-              <h3>🚀 Technologies Used</h3>
-              <div class="tech-tags">
-                <span v-for="tech in selectedProject.technologies" :key="tech" class="tech-tag">
-                  {{ tech }}
-                </span>
-              </div>
-            </div>
-
-            <div class="modal-links">
-              <h3>🔗 Links</h3>
-              <div class="link-buttons">
-                <a v-if="selectedProject.liveUrl" :href="selectedProject.liveUrl" target="_blank" class="modal-link live-link">
-                  <span class="link-icon">🚀</span> Live Demo
-                </a>
-                <a v-if="selectedProject.githubUrl" :href="selectedProject.githubUrl" target="_blank" class="modal-link github-link">
-                  <span class="link-icon">💻</span> View Source
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   </AppLayout>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import AppLayout from '../components/AppLayout.vue'
 
+// Game state
+const score = ref(0)
+const playerHealth = ref(100)
+const maxHealth = ref(100)
+const projectsFound = ref(0)
+const gameOver = ref(false)
+const victory = ref(false)
 const selectedProject = ref(null)
-const expandedProject = ref(null)
-const scifiGrid = ref(null)
+const gamePaused = ref(false)
 
-// Enhanced projects data with real examples
+// 2D Game variables
+let gameCanvas, gameCtx
+let player, bullets = [], asteroids = [], stars = [], particles = []
+let keys = {}
+let gameLoop
+let lastShootTime = 0
+const shootCooldown = 250 // milliseconds
+let gameWidth = 800
+let gameHeight = 600
+
+// Image assets
+let images = {
+  spaceship: null,
+  background: null,
+  explosion: null,
+  asteroids: []
+}
+let imagesLoaded = false
+
+// Enhanced projects data for asteroids
 const projects = ref([
   {
     id: 1,
-    name: 'E-Commerce Platform',
-    description: 'Full-stack e-commerce solution with real-time inventory management, secure payment processing, and advanced analytics dashboard.',
-    image: '/images/projects/ecommerce.jpg',
-    technologies: ['Laravel', 'Vue.js', 'MySQL', 'Redis', 'Stripe API'],
-    liveUrl: 'https://example-ecommerce.com',
-    githubUrl: 'https://github.com/example/ecommerce'
+    name: 'Commerce Asteroid',
+    description: 'An e-commerce platform with full shopping cart, payment integration, and admin dashboard. Built with Laravel and Vue.js.',
+    image: 'https://via.placeholder.com/400x300/0a0a0a/00ffff?text=E-Commerce',
+    technologies: ['Laravel', 'Vue.js', 'MySQL', 'Redis', 'Stripe'],
+    live_url: 'https://example-ecommerce.com',
+    github_url: 'https://github.com/example/ecommerce',
+    demo_url: 'https://demo-ecommerce.com',
+    maxHealth: 3,
+    color: '#00ffff'
   },
   {
     id: 2,
-    name: 'Mobile Banking App',
-    description: 'Cross-platform mobile banking application with biometric authentication, real-time transactions, and budget tracking features.',
-    image: '/images/projects/banking.jpg',
+    name: 'Banking Asteroid',
+    description: 'Mobile banking application with secure transactions, biometric authentication, and real-time notifications.',
+    image: 'https://via.placeholder.com/400x300/0a0a0a/ff00ff?text=Banking',
     technologies: ['Flutter', 'Node.js', 'PostgreSQL', 'JWT'],
-    liveUrl: 'https://example-banking.com',
-    githubUrl: 'https://github.com/example/banking'
+    live_url: 'https://example-banking.com',
+    github_url: 'https://github.com/example/banking',
+    maxHealth: 4,
+    color: '#ff00ff'
   },
   {
     id: 3,
-    name: '3D Game Engine',
-    description: 'Custom Unity game engine with physics simulation, multiplayer support, and cross-platform deployment capabilities.',
-    image: '/images/projects/game.jpg',
+    name: 'Game Asteroid',
+    description: 'Unity multiplayer game with real-time physics, custom networking, and cross-platform support.',
+    image: 'https://via.placeholder.com/400x300/0a0a0a/ffff00?text=Mobile+Game',
     technologies: ['Unity', 'C#', 'WebSocket', 'Redis'],
-    liveUrl: 'https://example-game.com',
-    githubUrl: 'https://github.com/example/game'
+    live_url: 'https://example-game.com',
+    github_url: 'https://github.com/example/game',
+    maxHealth: 5,
+    color: '#ffff00'
   },
   {
     id: 4,
-    name: 'AI Analytics Dashboard',
-    description: 'Real-time analytics dashboard with machine learning predictions, data visualization, and automated reporting features.',
-    image: '/images/projects/analytics.jpg',
+    name: 'Analytics Asteroid',
+    description: 'AI-powered analytics dashboard with machine learning insights and real-time data visualization.',
+    image: 'https://via.placeholder.com/400x300/0a0a0a/00ff00?text=Analytics',
     technologies: ['Python', 'Vue.js', 'TensorFlow', 'D3.js'],
-    liveUrl: 'https://example-analytics.com',
-    githubUrl: 'https://github.com/example/analytics'
+    live_url: 'https://example-analytics.com',
+    github_url: 'https://github.com/example/analytics',
+    maxHealth: 3,
+    color: '#00ff00'
   },
   {
     id: 5,
-    name: 'Social Media Platform',
-    description: 'Scalable social networking platform with real-time messaging, content sharing, and community features.',
-    image: '/images/projects/social.jpg',
+    name: 'Social Asteroid',
+    description: 'Social media platform with real-time messaging, content sharing, and community features.',
+    image: 'https://via.placeholder.com/400x300/0a0a0a/ff6b6b?text=Social+Network',
     technologies: ['Laravel', 'Vue.js', 'Socket.io', 'MySQL'],
-    liveUrl: 'https://example-social.com',
-    githubUrl: 'https://github.com/example/social'
+    live_url: 'https://example-social.com',
+    github_url: 'https://github.com/example/social',
+    maxHealth: 4,
+    color: '#ff6b6b'
   },
   {
     id: 6,
-    name: 'IoT Control System',
-    description: 'Smart home automation system with voice control, mobile app integration, and sensor monitoring capabilities.',
-    image: '/images/projects/iot.jpg',
+    name: 'IoT Asteroid',
+    description: 'Smart home automation system with IoT device control and environmental monitoring.',
+    image: 'https://via.placeholder.com/400x300/0a0a0a/4ecdc4?text=IoT+System',
     technologies: ['Flutter', 'Python', 'MQTT', 'Raspberry Pi'],
-    liveUrl: 'https://example-iot.com',
-    githubUrl: 'https://github.com/example/iot'
+    live_url: 'https://example-iot.com',
+    github_url: 'https://github.com/example/iot',
+    maxHealth: 3,
+    color: '#4ecdc4'
   }
 ])
 
-const toggleProject = (project) => {
-  // On mobile, expand inline instead of opening modal
-  if (window.innerWidth <= 768) {
-    if (expandedProject.value?.id === project.id) {
-      expandedProject.value = null
-    } else {
-      expandedProject.value = project
-    }
-  } else {
-    // On desktop, use the modal
-    selectProject(project)
+// Load game images
+const loadImages = async () => {
+  const imagePaths = {
+    spaceship: '/images/game/spaceship.png',
+    background: '/images/game/space-background.jpg',
+    explosion: '/images/game/explosion.png'
+  }
+
+  // Load asteroid images
+  for (let i = 1; i <= 6; i++) {
+    imagePaths[`asteroid-${i}`] = `/images/game/asteroid-${i}.png`
+  }
+
+  const loadImage = (src) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image()
+      img.onload = () => resolve(img)
+      img.onerror = () => {
+        console.warn(`Failed to load image: ${src}`)
+        resolve(null) // Resolve with null to continue without this image
+      }
+      img.src = src
+    })
+  }
+
+  try {
+    // Load all images
+    const loadedImages = await Promise.all(
+      Object.entries(imagePaths).map(async ([key, path]) => {
+        const img = await loadImage(path)
+        return [key, img]
+      })
+    )
+
+    // Store loaded images
+    loadedImages.forEach(([key, img]) => {
+      if (key.startsWith('asteroid-')) {
+        const index = parseInt(key.split('-')[1])
+        images.asteroids[index] = img
+      } else {
+        images[key] = img
+      }
+    })
+
+    imagesLoaded = true
+    console.log('All game images loaded successfully')
+  } catch (error) {
+    console.error('Error loading images:', error)
   }
 }
 
-const selectProject = (project) => {
-  selectedProject.value = project
-  expandedProject.value = null // Close expanded view when modal opens
+// Initialize 2D Canvas game
+const initGame = async () => {
+  // Get game canvas
+  gameCanvas = document.getElementById('game-canvas')
+  if (!gameCanvas) return
+
+  // Set canvas size
+  gameWidth = window.innerWidth
+  gameHeight = window.innerHeight * 0.6
+  gameCanvas.width = gameWidth
+  gameCanvas.height = gameHeight
+
+  // Get 2D context
+  gameCtx = gameCanvas.getContext('2d')
+
+  // Load images first
+  await loadImages()
+
+  // Initialize game objects
+  createStars()
+  createPlayer()
+  createAsteroids()
 }
 
+// Create background stars
+const createStars = () => {
+  for (let i = 0; i < 200; i++) {
+    stars.push({
+      x: Math.random() * gameWidth,
+      y: Math.random() * gameHeight,
+      size: Math.random() * 2,
+      speed: Math.random() * 0.5 + 0.1,
+      brightness: Math.random()
+    })
+  }
+}
+
+// Create player spaceship
+const createPlayer = () => {
+  player = {
+    x: gameWidth / 2,
+    y: gameHeight - 100,
+    width: 40,
+    height: 50,
+    speed: 5,
+    color: '#00ffff'
+  }
+}
+
+// Create asteroids from project data
+const createAsteroids = () => {
+  projects.value.forEach((project, index) => {
+    const asteroid = {
+      x: Math.random() * (gameWidth - 60) + 30,
+      y: -100 - (index * 150),
+      width: 60,
+      height: 60,
+      speed: Math.random() * 1.5 + 0.5,
+      rotation: 0,
+      rotationSpeed: (Math.random() - 0.5) * 0.05,
+      color: project.color,
+      projectId: project.id,
+      project: project,
+      health: project.maxHealth,
+      maxHealth: project.maxHealth,
+      discovered: false,
+      vertices: generateAsteroidShape()
+    }
+    asteroids.push(asteroid)
+  })
+}
+
+// Generate random asteroid shape
+const generateAsteroidShape = () => {
+  const vertices = []
+  const points = 8
+  for (let i = 0; i < points; i++) {
+    const angle = (i / points) * Math.PI * 2
+    const radius = 25 + Math.random() * 10
+    vertices.push({
+      x: Math.cos(angle) * radius,
+      y: Math.sin(angle) * radius
+    })
+  }
+  return vertices
+}
+
+// Create bullet
+const createBullet = () => {
+  const currentTime = Date.now()
+  if (currentTime - lastShootTime < shootCooldown) return
+
+  lastShootTime = currentTime
+
+  const bullet = {
+    x: player.x,
+    y: player.y - 20,
+    width: 4,
+    height: 10,
+    speed: 10,
+    color: '#00ff00'
+  }
+
+  bullets.push(bullet)
+
+  // Add muzzle flash effect
+  createMuzzleFlash(player.x, player.y - 20)
+}
+
+// Create muzzle flash effect
+const createMuzzleFlash = (x, y) => {
+  for (let i = 0; i < 5; i++) {
+    particles.push({
+      x: x + (Math.random() - 0.5) * 10,
+      y: y,
+      vx: (Math.random() - 0.5) * 2,
+      vy: Math.random() * 2,
+      size: Math.random() * 3 + 1,
+      color: '#ffff00',
+      life: 10
+    })
+  }
+}
+
+// Handle keyboard input
+const handleKeyDown = (event) => {
+  keys[event.code] = true
+
+  if (event.code === 'Space') {
+    event.preventDefault()
+    if (!gameOver.value && !gamePaused.value) {
+      createBullet()
+    }
+  }
+}
+
+const handleKeyUp = (event) => {
+  keys[event.code] = false
+}
+
+// Mobile control handlers
+const handleMobileMoveStart = (direction) => {
+  keys[`mobile-${direction}`] = true
+  // Prevent default touch behavior
+  if (event && event.preventDefault) {
+    event.preventDefault()
+  }
+}
+
+const handleMobileMoveEnd = (direction) => {
+  keys[`mobile-${direction}`] = false
+  // Prevent default touch behavior
+  if (event && event.preventDefault) {
+    event.preventDefault()
+  }
+}
+
+const handleMobileFire = () => {
+  if (!gameOver.value && !gamePaused.value) {
+    createBullet()
+  }
+  // Prevent default touch behavior
+  if (event && event.preventDefault) {
+    event.preventDefault()
+  }
+}
+
+const handleMobileFireEnd = () => {
+  // Prevent default touch behavior
+  if (event && event.preventDefault) {
+    event.preventDefault()
+  }
+}
+
+// Update player movement
+const updatePlayer = () => {
+  if (!player || gameOver.value || gamePaused.value) return
+
+  // Handle keyboard input
+  if (keys['ArrowLeft'] && player.x > 20) {
+    player.x -= player.speed
+  }
+  if (keys['ArrowRight'] && player.x < gameWidth - 20) {
+    player.x += player.speed
+  }
+
+  // Handle mobile touch input
+  if (keys['mobile-left'] && player.x > 20) {
+    player.x -= player.speed
+  }
+  if (keys['mobile-right'] && player.x < gameWidth - 20) {
+    player.x += player.speed
+  }
+}
+
+// Update bullets
+const updateBullets = () => {
+  if (gameOver.value || gamePaused.value) return
+
+  for (let i = bullets.length - 1; i >= 0; i--) {
+    const bullet = bullets[i]
+    bullet.y -= bullet.speed
+
+    // Remove bullets that go off screen
+    if (bullet.y < -10) {
+      bullets.splice(i, 1)
+      continue
+    }
+
+    // Check collision with asteroids
+    for (let j = asteroids.length - 1; j >= 0; j--) {
+      const asteroid = asteroids[j]
+
+      if (checkCollision(bullet, asteroid)) {
+        // Hit asteroid
+        asteroid.health--
+
+        // Create hit effect
+        createHitEffect(asteroid.x, asteroid.y)
+
+        // Remove bullet
+        bullets.splice(i, 1)
+
+        // Check if asteroid is destroyed
+        if (asteroid.health <= 0) {
+          destroyAsteroid(asteroid, j)
+        }
+
+        break
+      }
+    }
+  }
+}
+
+// Check collision between two objects
+const checkCollision = (obj1, obj2) => {
+  return obj1.x < obj2.x + obj2.width &&
+         obj1.x + obj1.width > obj2.x &&
+         obj1.y < obj2.y + obj2.height &&
+         obj1.y + obj1.height > obj2.y
+}
+
+// Create hit effect
+const createHitEffect = (x, y) => {
+  for (let i = 0; i < 10; i++) {
+    particles.push({
+      x: x,
+      y: y,
+      vx: (Math.random() - 0.5) * 5,
+      vy: (Math.random() - 0.5) * 5,
+      size: Math.random() * 4 + 2,
+      color: '#ffaa00',
+      life: 20
+    })
+  }
+}
+
+// Destroy asteroid and show project
+const destroyAsteroid = (asteroid, index) => {
+  const project = asteroid.project
+
+  // Create explosion effect
+  createExplosionEffect(asteroid.x, asteroid.y)
+
+  // Remove asteroid
+  asteroids.splice(index, 1)
+
+  // Update score and projects found
+  score.value += 100
+  projectsFound.value++
+
+  // Mark project as discovered
+  project.discovered = true
+
+  // Pause game and show project details
+  gamePaused.value = true
+  selectedProject.value = project
+
+  // Check victory condition
+  if (projectsFound.value >= projects.value.length) {
+    victory.value = true
+    gameOver.value = true
+  }
+}
+
+// Create explosion effect
+const createExplosionEffect = (x, y) => {
+  // Create explosion sprite if image is available
+  if (images.explosion && imagesLoaded) {
+    particles.push({
+      x: x,
+      y: y,
+      vx: 0,
+      vy: 0,
+      size: 80,
+      image: images.explosion,
+      isExplosion: true,
+      life: 20
+    })
+  }
+
+  // Also create particle effects for additional visual impact
+  for (let i = 0; i < 20; i++) {
+    particles.push({
+      x: x,
+      y: y,
+      vx: (Math.random() - 0.5) * 8,
+      vy: (Math.random() - 0.5) * 8,
+      size: Math.random() * 6 + 2,
+      color: Math.random() > 0.5 ? '#ff6600' : '#ffaa00',
+      life: 30
+    })
+  }
+}
+
+// Update asteroids
+const updateAsteroids = () => {
+  if (gameOver.value || gamePaused.value) return
+
+  for (let i = asteroids.length - 1; i >= 0; i--) {
+    const asteroid = asteroids[i]
+
+    // Move asteroid
+    asteroid.y += asteroid.speed
+    asteroid.rotation += asteroid.rotationSpeed
+
+    // Check collision with player
+    if (checkSpaceshipCollision(asteroid)) {
+      handleSpaceshipCollision()
+      return
+    }
+
+    // Reset asteroid position if it goes past player
+    if (asteroid.y > gameHeight + 100) {
+      asteroids.splice(i, 1)
+
+      // Damage player if asteroid gets past
+      playerHealth.value = Math.max(0, playerHealth.value - 10)
+      if (playerHealth.value <= 0) {
+        handleSpaceshipCollision()
+      }
+    }
+  }
+
+  // Spawn new asteroids if needed
+  if (asteroids.length < projects.value.length && Math.random() < 0.01) {
+    spawnNewAsteroid()
+  }
+}
+
+// Check collision between spaceship and asteroid
+const checkSpaceshipCollision = (asteroid) => {
+  const distance = Math.sqrt(
+    Math.pow(asteroid.x - player.x, 2) +
+    Math.pow(asteroid.y - player.y, 2)
+  )
+
+  // Use collision radius based on asteroid and player size
+  const collisionRadius = (asteroid.width / 2) + (player.width / 2) - 10 // Small buffer for better gameplay
+
+  return distance < collisionRadius
+}
+
+// Handle spaceship collision with asteroid
+const handleSpaceshipCollision = () => {
+  gameOver.value = true
+
+  // Create large explosion at spaceship position
+  createSpaceshipExplosion()
+
+  // Stop the game
+  gamePaused.value = true
+}
+
+// Create spaceship explosion effect
+const createSpaceshipExplosion = () => {
+  // Create explosion sprite if image is available
+  if (images.explosion && imagesLoaded) {
+    particles.push({
+      x: player.x,
+      y: player.y,
+      vx: 0,
+      vy: 0,
+      size: 120, // Larger explosion for spaceship
+      image: images.explosion,
+      isExplosion: true,
+      life: 40, // Longer lasting explosion
+      isPlayerExplosion: true
+    })
+  }
+
+  // Create many particle effects for spaceship explosion
+  for (let i = 0; i < 50; i++) {
+    const angle = (Math.PI * 2 * i) / 50
+    const speed = Math.random() * 10 + 5
+    particles.push({
+      x: player.x,
+      y: player.y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      size: Math.random() * 8 + 2,
+      color: Math.random() > 0.5 ? '#ff0000' : '#ff6600',
+      life: 60,
+      isPlayerExplosion: true
+    })
+  }
+
+  // Create debris particles (ship fragments)
+  for (let i = 0; i < 20; i++) {
+    particles.push({
+      x: player.x,
+      y: player.y,
+      vx: (Math.random() - 0.5) * 15,
+      vy: (Math.random() - 0.5) * 15,
+      size: Math.random() * 6 + 3,
+      color: '#00ffff',
+      life: 40,
+      isPlayerExplosion: true
+    })
+  }
+}
+
+// Spawn new asteroid
+const spawnNewAsteroid = () => {
+  const availableProjects = projects.value.filter(p => !p.discovered)
+  if (availableProjects.length === 0) return
+
+  const project = availableProjects[Math.floor(Math.random() * availableProjects.length)]
+  const asteroid = {
+    x: Math.random() * (gameWidth - 60) + 30,
+    y: -60,
+    width: 60,
+    height: 60,
+    speed: Math.random() * 1.5 + 0.5,
+    rotation: 0,
+    rotationSpeed: (Math.random() - 0.5) * 0.05,
+    color: project.color,
+    projectId: project.id,
+    project: project,
+    health: project.maxHealth,
+    maxHealth: project.maxHealth,
+    discovered: false,
+    vertices: generateAsteroidShape()
+  }
+  asteroids.push(asteroid)
+}
+
+// Update particles
+const updateParticles = () => {
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const particle = particles[i]
+
+    particle.x += particle.vx
+    particle.y += particle.vy
+    particle.life--
+
+    if (particle.life <= 0) {
+      particles.splice(i, 1)
+    }
+  }
+}
+
+// Update stars
+const updateStars = () => {
+  stars.forEach(star => {
+    star.y += star.speed
+    if (star.y > gameHeight) {
+      star.y = 0
+      star.x = Math.random() * gameWidth
+    }
+  })
+}
+
+// Draw game objects
+const draw = () => {
+  // Clear canvas
+  gameCtx.fillStyle = '#000814'
+  gameCtx.fillRect(0, 0, gameWidth, gameHeight)
+
+  // Draw background image if available
+  if (images.background && imagesLoaded) {
+    gameCtx.drawImage(images.background, 0, 0, gameWidth, gameHeight)
+  } else {
+    // Fallback: draw gradient background
+    const gradient = gameCtx.createLinearGradient(0, 0, 0, gameHeight)
+    gradient.addColorStop(0, '#000814')
+    gradient.addColorStop(1, '#001122')
+    gameCtx.fillStyle = gradient
+    gameCtx.fillRect(0, 0, gameWidth, gameHeight)
+  }
+
+  // Draw stars (only if no background image)
+  if (!images.background || !imagesLoaded) {
+    stars.forEach(star => {
+      gameCtx.fillStyle = `rgba(255, 255, 255, ${star.brightness})`
+      gameCtx.beginPath()
+      gameCtx.arc(star.x, star.y, star.size, 0, Math.PI * 2)
+      gameCtx.fill()
+    })
+  }
+
+  // Draw particles
+  particles.forEach(particle => {
+    if (particle.isExplosion && particle.image) {
+      // Draw explosion image
+      const opacity = particle.life / (particle.isPlayerExplosion ? 40 : 20)
+      gameCtx.globalAlpha = opacity
+      gameCtx.drawImage(
+        particle.image,
+        particle.x - particle.size / 2,
+        particle.y - particle.size / 2,
+        particle.size,
+        particle.size
+      )
+      gameCtx.globalAlpha = 1
+    } else {
+      // Draw regular particle
+      const opacity = particle.life / (particle.isPlayerExplosion ? 60 : 30)
+      gameCtx.fillStyle = particle.color + Math.floor(opacity * 255).toString(16).padStart(2, '0')
+      gameCtx.beginPath()
+      gameCtx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2)
+      gameCtx.fill()
+    }
+  })
+
+  // Draw asteroids
+  asteroids.forEach(asteroid => {
+    drawAsteroid(asteroid)
+  })
+
+  // Draw bullets
+  bullets.forEach(bullet => {
+    gameCtx.fillStyle = bullet.color
+    gameCtx.shadowColor = bullet.color
+    gameCtx.shadowBlur = 10
+    gameCtx.fillRect(bullet.x - bullet.width/2, bullet.y - bullet.height/2, bullet.width, bullet.height)
+    gameCtx.shadowBlur = 0
+  })
+
+  // Draw player (only if game is not over)
+  if (!gameOver.value) {
+    drawPlayer()
+  }
+
+  // Draw health bars above asteroids
+  asteroids.forEach(asteroid => {
+    drawHealthBar(asteroid)
+  })
+}
+
+// Draw player spaceship
+const drawPlayer = () => {
+  gameCtx.save()
+  gameCtx.translate(player.x, player.y)
+
+  // Draw spaceship image if available
+  if (images.spaceship && imagesLoaded) {
+    gameCtx.drawImage(
+      images.spaceship,
+      -player.width / 2,
+      -player.height / 2,
+      player.width,
+      player.height
+    )
+  } else {
+    // Fallback: draw hand-drawn spaceship
+    gameCtx.fillStyle = player.color
+    gameCtx.shadowColor = player.color
+    gameCtx.shadowBlur = 15
+
+    // Main body (triangle)
+    gameCtx.beginPath()
+    gameCtx.moveTo(0, -25)
+    gameCtx.lineTo(-15, 15)
+    gameCtx.lineTo(15, 15)
+    gameCtx.closePath()
+    gameCtx.fill()
+
+    // Wings
+    gameCtx.fillStyle = '#0099cc'
+    gameCtx.beginPath()
+    gameCtx.moveTo(-15, 10)
+    gameCtx.lineTo(-25, 20)
+    gameCtx.lineTo(-10, 20)
+    gameCtx.closePath()
+    gameCtx.fill()
+
+    gameCtx.beginPath()
+    gameCtx.moveTo(15, 10)
+    gameCtx.lineTo(25, 20)
+    gameCtx.lineTo(10, 20)
+    gameCtx.closePath()
+    gameCtx.fill()
+
+    // Engine glow
+    gameCtx.fillStyle = '#ff6600'
+    gameCtx.shadowColor = '#ff6600'
+    gameCtx.beginPath()
+    gameCtx.arc(0, 15, 5, 0, Math.PI * 2)
+    gameCtx.fill()
+  }
+
+  gameCtx.restore()
+}
+
+// Draw asteroid
+const drawAsteroid = (asteroid) => {
+  gameCtx.save()
+  gameCtx.translate(asteroid.x, asteroid.y)
+  gameCtx.rotate(asteroid.rotation)
+
+  // Draw asteroid image if available
+  const asteroidImage = images.asteroids[asteroid.projectId]
+  if (asteroidImage && imagesLoaded) {
+    gameCtx.drawImage(
+      asteroidImage,
+      -asteroid.width / 2,
+      -asteroid.height / 2,
+      asteroid.width,
+      asteroid.height
+    )
+  } else {
+    // Fallback: draw hand-drawn asteroid
+    gameCtx.fillStyle = asteroid.color
+    gameCtx.strokeStyle = asteroid.color
+    gameCtx.shadowColor = asteroid.color
+    gameCtx.shadowBlur = 20
+
+    gameCtx.beginPath()
+    asteroid.vertices.forEach((vertex, index) => {
+      if (index === 0) {
+        gameCtx.moveTo(vertex.x, vertex.y)
+      } else {
+        gameCtx.lineTo(vertex.x, vertex.y)
+      }
+    })
+    gameCtx.closePath()
+    gameCtx.stroke()
+
+    // Fill with transparency
+    gameCtx.fillStyle = asteroid.color + '40'
+    gameCtx.fill()
+  }
+
+  // Draw project name
+  gameCtx.restore()
+  gameCtx.save()
+  gameCtx.translate(asteroid.x, asteroid.y)
+  gameCtx.fillStyle = '#ffffff'
+  gameCtx.font = 'bold 12px Arial'
+  gameCtx.textAlign = 'center'
+  gameCtx.shadowBlur = 5
+  gameCtx.shadowColor = '#000000'
+  gameCtx.fillText(asteroid.project.name, 0, -asteroid.height / 2 - 10)
+
+  gameCtx.restore()
+}
+
+// Draw health bar above asteroid
+const drawHealthBar = (asteroid) => {
+  const barWidth = 40
+  const barHeight = 4
+  const x = asteroid.x - barWidth / 2
+  const y = asteroid.y - 35
+
+  // Background
+  gameCtx.fillStyle = '#333333'
+  gameCtx.fillRect(x, y, barWidth, barHeight)
+
+  // Health fill
+  const healthPercent = asteroid.health / asteroid.maxHealth
+  const healthColor = healthPercent > 0.5 ? '#00ff00' : healthPercent > 0.25 ? '#ffff00' : '#ff0000'
+  gameCtx.fillStyle = healthColor
+  gameCtx.fillRect(x, y, barWidth * healthPercent, barHeight)
+
+  // Border
+  gameCtx.strokeStyle = '#ffffff'
+  gameCtx.strokeRect(x, y, barWidth, barHeight)
+}
+
+// Main game loop
+const animate = () => {
+  if (!gamePaused.value && !gameOver.value) {
+    updatePlayer()
+    updateBullets()
+    updateAsteroids()
+    updateParticles()
+    updateStars()
+  }
+
+  draw()
+  requestAnimationFrame(animate)
+}
+
+// Handle window resize
+const handleResize = () => {
+  gameWidth = window.innerWidth
+  gameHeight = window.innerHeight * 0.6
+
+  if (gameCanvas) {
+    gameCanvas.width = gameWidth
+    gameCanvas.height = gameHeight
+  }
+}
+
+// Project modal methods
 const closeProjectModal = () => {
+  selectedProject.value = null
+  resumeGame()
+}
+
+const resumeGame = () => {
+  gamePaused.value = false
   selectedProject.value = null
 }
 
-const getProjectColor = (id) => {
-  const colors = [
-    '#00ffff', // Cyan
-    '#ff00ff', // Magenta
-    '#ffff00', // Yellow
-    '#00ff00', // Green
-    '#ff6b6b', // Red
-    '#4ecdc4'  // Teal
-  ]
-  return colors[id - 1] || '#00ffff'
+// Restart game
+const restartGame = () => {
+  // Reset game state
+  score.value = 0
+  playerHealth.value = maxHealth.value
+  projectsFound.value = 0
+  gameOver.value = false
+  victory.value = false
+  gamePaused.value = false
+  selectedProject.value = null
+
+  // Reset projects discovered status
+  projects.value.forEach(project => {
+    project.discovered = false
+  })
+
+  // Reset arrays
+  bullets = []
+  asteroids = []
+  stars = []
+  particles = []
+
+  // Reinitialize game
+  initGame()
 }
 
-const getProjectIcon = (id) => {
-  const icons = ['🛒', '📱', '🎮', '📊', '🌐', '🏠']
-  return icons[id - 1] || '🚀'
-}
+// Initialize game
+onMounted(async () => {
+  await nextTick()
+  await initGame()
+  animate()
 
-const getSpherePosition = (index) => {
-  const totalCards = projects.value.length
-  const radius = 300
+  // Add event listeners
+  window.addEventListener('keydown', handleKeyDown)
+  window.addEventListener('keyup', handleKeyUp)
+  window.addEventListener('resize', handleResize)
+})
 
-  // Distribute points evenly on sphere surface using golden ratio
-  const goldenRatio = (1 + Math.sqrt(5)) / 2
-  const angleIncrement = Math.PI * 2 * goldenRatio
-
-  const y = 1 - (index / (totalCards - 1)) * 2 // y goes from 1 to -1
-  const radiusAtY = Math.sqrt(1 - y * y)
-  const theta = angleIncrement * index
-
-  const x = Math.cos(theta) * radiusAtY
-  const z = Math.sin(theta) * radiusAtY
-
-  return {
-    x: x * radius,
-    y: y * radius,
-    z: z * radius
-  }
-}
-
-const getCardRotation = (index) => {
-  const pos = getSpherePosition(index)
-  // Calculate rotation to face outward from sphere center
-  const yaw = Math.atan2(pos.x, pos.z) * (180 / Math.PI)
-  const pitch = Math.asin(pos.y / 300) * (180 / Math.PI)
-  return { x: -pitch, y: yaw, z: 0 }
-}
-
-const getCardCurvature = (index) => {
-  const pos = getSpherePosition(index)
-  // Calculate the amount of curvature needed based on position
-  const distance = Math.sqrt(pos.x * pos.x + pos.z * pos.z)
-  const curvatureFactor = 1 - (distance / 300) * 0.3 // Less curvature on edges, more on center
-  return curvatureFactor
-}
+// Cleanup
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown)
+  window.removeEventListener('keyup', handleKeyUp)
+  window.removeEventListener('resize', handleResize)
+})
 </script>
 
 <style scoped>
-
-/* Projects Header */
-.projects-header {
-  padding: 8rem 2rem 3rem;
-  text-align: center;
-  position: relative;
-  z-index: 10;
-}
-
-.projects-title {
-  font-size: clamp(2.5rem, 8vw, 4rem);
-  font-weight: 900;
-  margin-bottom: 1rem;
-  background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: gradient-shift 3s ease infinite;
-}
-
-@keyframes gradient-shift {
-  0%, 100% { filter: hue-rotate(0deg); }
-  50% { filter: hue-rotate(30deg); }
-}
-
-.projects-subtitle {
-  font-size: 1.2rem;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-/* 3D Iron Man Style Wireframe Sphere Section */
-.scifi-grid-section {
-  padding: 0 2rem 4rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  perspective: 1200px;
-  min-height: 700px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: radial-gradient(ellipse at center, #001d3d 0%, #000814 100%);
-  position: relative;
-}
-
-.scifi-grid-container {
-  width: 100%;
-  height: 600px;
-  position: relative;
-  transform-style: preserve-3d;
-  animation: sphereRotate 40s linear infinite;
-}
-
-@keyframes sphereRotate {
-  from {
-    transform: rotateY(0deg) rotateX(-10deg);
-  }
-  to {
-    transform: rotateY(360deg) rotateX(-10deg);
-  }
-}
-
-/* Wireframe Sphere Structure */
-.wireframe-sphere {
-  position: absolute;
-  width: 600px;
-  height: 600px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  transform-style: preserve-3d;
-  pointer-events: none;
-}
-
-.wireframe-circle {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border: 1px solid rgba(255, 214, 10, 0.3);
-  border-radius: 50%;
-  box-shadow:
-    0 0 10px rgba(255, 214, 10, 0.2),
-    inset 0 0 10px rgba(255, 214, 10, 0.1);
-  animation: wireframePulse 3s ease-in-out infinite;
-}
-
-.wireframe-latitude {
-  border-style: dashed;
-}
-
-.wireframe-longitude {
-  border-style: solid;
-}
-
-.sphere-core {
-  position: absolute;
-  width: 60px;
-  height: 60px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: radial-gradient(circle, rgba(255, 214, 10, 0.8) 0%, rgba(255, 214, 10, 0.3) 50%, transparent 70%);
-  border-radius: 50%;
-  box-shadow:
-    0 0 30px rgba(255, 214, 10, 0.6),
-    0 0 60px rgba(255, 214, 10, 0.3),
-    inset 0 0 20px rgba(255, 255, 255, 0.5);
-  animation: corePulse 2s ease-in-out infinite;
-}
-
-@keyframes wireframePulse {
-  0%, 100% {
-    opacity: 0.3;
-    border-color: rgba(255, 214, 10, 0.3);
-  }
-  50% {
-    opacity: 0.8;
-    border-color: rgba(255, 214, 10, 0.6);
-  }
-}
-
-@keyframes corePulse {
-  0%, 100% {
-    transform: translate(-50%, -50%) scale(1);
-    box-shadow:
-      0 0 30px rgba(255, 214, 10, 0.6),
-      0 0 60px rgba(255, 214, 10, 0.3),
-      inset 0 0 20px rgba(255, 255, 255, 0.5);
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.2);
-    box-shadow:
-      0 0 40px rgba(255, 214, 10, 0.8),
-      0 0 80px rgba(255, 214, 10, 0.5),
-      inset 0 0 30px rgba(255, 255, 255, 0.7);
-  }
-}
-
-.scifi-grid {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  transform-style: preserve-3d;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* 3D Sci-Fi Project Cards on Sphere */
-.scifi-project-card {
-  position: absolute;
-  width: 180px;
-  height: 220px;
-  transform-style: preserve-3d;
-  transition: all 0.4s ease;
-  cursor: pointer;
-  animation: sphereCardPulse 4s ease-in-out infinite;
-  left: 50%;
-  top: 50%;
-  margin-left: -90px;
-  margin-top: -110px;
-  perspective: 400px;
-}
-
-.scifi-project-card:hover {
-  filter: brightness(1.3) drop-shadow(0 0 20px rgba(0, 255, 255, 0.6));
-  animation-play-state: paused;
-  z-index: 100;
-}
-
-.scifi-project-card:hover .scifi-frame {
-  transform: perspective(300px) rotateY(0deg) translateZ(10px) scale(1.05);
-  border-radius: calc(12px * var(--curvature));
-}
-
-.scifi-project-card.expanded {
-  transform: scale(1.5);
-  z-index: 200;
-  filter: brightness(1.5) drop-shadow(0 0 30px rgba(0, 255, 255, 0.8));
-}
-
-.scifi-project-card.active {
-  z-index: 150;
-}
-
-@keyframes sphereCardPulse {
-  0%, 100% {
-    filter: brightness(1) drop-shadow(0 0 10px rgba(0, 255, 255, 0.3));
-  }
-  50% {
-    filter: brightness(1.1) drop-shadow(0 0 15px rgba(0, 255, 255, 0.5));
-  }
-}
-
-.scifi-frame {
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 8, 20, 0.95);
-  border: 1px solid rgba(255, 214, 10, 0.4);
-  border-radius: 15px;
+/* Space Game Section */
+.space-game-section {
+  min-height: 100vh;
+  background: linear-gradient(135deg,
+    rgba(0, 8, 20, 0.95) 0%,
+    rgba(26, 0, 51, 0.9) 50%,
+    rgba(0, 8, 20, 0.95) 100%);
+  color: white;
+  padding: 2rem;
   position: relative;
   overflow: hidden;
-  backdrop-filter: blur(15px);
-  box-shadow:
-    0 0 20px rgba(255, 214, 10, 0.3),
-    inset 0 0 15px rgba(255, 214, 10, 0.1);
-  transform-style: preserve-3d;
-  transform: perspective(300px) rotateY(0deg) translateZ(0px);
-  transition: transform 0.4s ease;
-  border-radius: calc(15px * var(--curvature));
 }
 
-.scifi-frame::before {
-  content: '';
-  position: absolute;
-  top: -1px;
-  left: -1px;
-  right: -1px;
-  bottom: -1px;
-  background: linear-gradient(45deg, transparent, rgba(255, 214, 10, 0.2), transparent);
-  border-radius: calc(15px * var(--curvature));
-  z-index: -1;
-  animation: frameScan 2s linear infinite;
-}
-
-/* Curved card content overlay */
-.scifi-frame::after {
+.space-game-section::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 10, 30, 0.2) 100%);
-  border-radius: calc(15px * var(--curvature));
+  background:
+    radial-gradient(circle at 20% 50%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(255, 214, 10, 0.05) 0%, transparent 50%);
   pointer-events: none;
   z-index: 1;
 }
 
-@keyframes frameScan {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-/* Curved Surface Effect */
-.scifi-curved-surface {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: calc(15px * var(--curvature));
-  background: linear-gradient(135deg,
-    rgba(255, 214, 10, 0.05) 0%,
-    transparent 30%,
-    transparent 70%,
-    rgba(255, 214, 10, 0.05) 100%);
-  transform-style: preserve-3d;
-  transform: perspective(200px) rotateX(calc(5deg * var(--curvature)));
-  pointer-events: none;
+/* Game Header */
+.game-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  position: relative;
   z-index: 2;
 }
 
-.scifi-curved-surface::before {
-  content: '';
+.game-title {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 900;
+  margin: 0 0 1rem 0;
+  background: linear-gradient(45deg, #00ffff, #ff00ff, #ffd60a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 50px rgba(0, 255, 255, 0.5);
+  animation: titlePulse 4s ease-in-out infinite;
+}
+
+@keyframes titlePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.game-subtitle {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 2rem;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.game-stats {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.stat:hover {
+  border-color: rgba(0, 255, 255, 0.5);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #00ffff;
+  text-shadow: 0 0 15px currentColor;
+}
+
+/* Game Container */
+.game-container {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  z-index: 2;
+  height: 60vh;
+  min-height: 400px;
+}
+
+.game-canvas {
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 100px rgba(0, 255, 255, 0.1),
+    inset 0 0 50px rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(0, 255, 255, 0.3);
+  background: #000814;
+  display: block;
+  image-rendering: optimizeSpeed;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: pixelated;
+}
+
+/* Game UI Overlay */
+.game-ui {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: calc(15px * var(--curvature));
-  background:
-    radial-gradient(ellipse at 30% 30%, rgba(255, 214, 10, 0.1) 0%, transparent 50%),
-    radial-gradient(ellipse at 70% 70%, rgba(255, 140, 0, 0.05) 0%, transparent 50%);
-  animation: curvedSurfaceShimmer 3s ease-in-out infinite;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  padding: 2rem;
 }
 
-@keyframes curvedSurfaceShimmer {
-  0%, 100% {
-    opacity: 0.3;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.7;
-    transform: scale(1.02);
-  }
+.game-ui > * {
+  pointer-events: auto;
 }
 
-.scifi-icon-container {
+/* Health Bar */
+.health-bar-container {
   position: absolute;
-  top: 15px;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 2rem;
+  left: 2rem;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 1rem;
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  min-width: 200px;
+}
+
+.health-label {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.health-bar {
+  width: 100%;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.health-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff0000, #ff6600, #00ff00);
+  transition: width 0.3s ease;
+  box-shadow: 0 0 10px currentColor;
+}
+
+/* Controls Info */
+.controls-info {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 1rem;
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+/* Desktop/Mobile Visibility */
+.desktop-only {
+  display: block;
+}
+
+.mobile-only {
+  display: none;
+}
+
+/* Mobile Controls */
+.mobile-controls {
+  position: absolute;
+  bottom: 1rem;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 1rem;
+  pointer-events: none;
   z-index: 10;
 }
 
-.scifi-icon-bg {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
+.movement-controls.left-controls {
+  order: 1;
+}
+
+.fire-controls.right-controls {
+  order: 2;
+}
+
+.movement-controls {
+  display: flex;
+  gap: 1rem;
+  pointer-events: auto;
+}
+
+.left-controls {
+  display: flex;
+  gap: 1rem;
+}
+
+.right-controls {
+  pointer-events: auto;
+}
+
+.mobile-btn {
+  background: rgba(0, 0, 0, 0.7);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 15px;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.mobile-btn:active {
+  background: rgba(0, 255, 255, 0.3);
+  border-color: rgba(0, 255, 255, 0.6);
+  transform: scale(0.95);
+}
+
+.move-btn {
+  width: 60px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
-  position: relative;
-  background: rgba(0, 20, 40, 0.8);
-  border: 1px solid var(--icon-color);
-  box-shadow: 0 0 15px var(--icon-color);
-  animation: iconPulse 2.5s ease-in-out infinite;
+  font-weight: bold;
 }
 
-@keyframes iconPulse {
-  0%, 100% {
-    box-shadow: 0 0 15px var(--icon-color);
-    border-color: var(--icon-color);
-  }
-  50% {
-    box-shadow: 0 0 25px var(--icon-color), 0 0 40px var(--icon-color);
-    border-color: rgba(255, 255, 255, 0.8);
-  }
-}
-
-.scifi-icon-glow {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 70px;
-  height: 70px;
-  background: radial-gradient(circle, var(--icon-color) 0%, transparent 70%);
-  border-radius: 50%;
-  opacity: 0.4;
-  animation: glowExpand 3s ease-in-out infinite;
-}
-
-@keyframes glowExpand {
-  0%, 100% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.4;
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.3);
-    opacity: 0.1;
-  }
-}
-
-.scifi-compact {
-  position: absolute;
-  top: 75px;
-  left: 10px;
-  right: 10px;
-  text-align: center;
-}
-
-.scifi-project-name {
-  color: #ffffff;
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  background: linear-gradient(45deg, #00ffff, #0099cc);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
-  line-height: 1.2;
-}
-
-.scifi-tech-compact {
+.fire-btn {
+  width: 100px;
+  height: 50px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.2rem;
+  align-items: center;
   justify-content: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  background: rgba(255, 0, 0, 0.7);
+  border-color: rgba(255, 100, 100, 0.5);
 }
 
-.scifi-tech-tag {
-  background: rgba(0, 100, 150, 0.2);
-  border: 1px solid rgba(0, 200, 255, 0.4);
-  color: #00ccff;
-  padding: 0.1rem 0.3rem;
-  border-radius: 8px;
-  font-size: 0.55rem;
-  transition: all 0.3s ease;
+.fire-btn:active {
+  background: rgba(255, 0, 0, 0.9);
+  border-color: rgba(255, 100, 100, 0.8);
+}
+
+.btn-icon {
+  font-size: 1.8rem;
+}
+
+.btn-label {
+  font-size: 0.9rem;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
-  font-weight: 500;
+  letter-spacing: 1px;
 }
 
-.scifi-tech-tag.more {
-  background: rgba(0, 150, 200, 0.2);
-  border-color: rgba(0, 200, 255, 0.6);
+.control-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.control-item:last-child {
+  margin-bottom: 0;
+}
+
+.key {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.3rem 0.6rem;
+  border-radius: 5px;
+  font-family: monospace;
+  font-weight: bold;
   color: #00ffff;
+  min-width: 3rem;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
-.scifi-expanded {
+.control-desc {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+/* Game Over Screen */
+.game-over-screen,
+.victory-screen {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 90%;
-  background: rgba(0, 0, 0, 0.95);
-  border: 1px solid rgba(0, 255, 255, 0.3);
-  border-radius: 15px;
-  padding: 1.5rem;
-  backdrop-filter: blur(20px);
-  z-index: 20;
-  animation: expandIn 0.5s ease-out;
+  max-width: 400px;
+  animation: screenAppear 0.5s ease-out;
 }
 
-@keyframes expandIn {
+@keyframes screenAppear {
   from {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.8);
@@ -706,124 +1405,109 @@ const getCardCurvature = (index) => {
   }
 }
 
-.scifi-description {
+.game-over-content,
+.victory-content {
+  background: linear-gradient(135deg,
+    rgba(10, 10, 30, 0.95) 0%,
+    rgba(26, 0, 51, 0.95) 50%,
+    rgba(0, 8, 20, 0.95) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  padding: 3rem;
+  text-align: center;
+  backdrop-filter: blur(20px);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 100px rgba(255, 255, 255, 0.1);
+}
+
+.game-over-title {
+  color: #ff6b6b;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 20px currentColor;
+  animation: titleShake 0.5s ease-in-out;
+}
+
+@keyframes titleShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.victory-title {
+  color: #00ff00;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 20px currentColor;
+  animation: titlePulse 1s ease-in-out infinite;
+}
+
+@keyframes titlePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.game-over-message,
+.victory-message {
   color: rgba(255, 255, 255, 0.9);
-  line-height: 1.5;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
 }
 
-.scifi-tech {
+.game-over-stats,
+.victory-stats {
+  margin-bottom: 2rem;
+}
+
+.stat-row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-  margin-bottom: 1rem;
-  justify-content: center;
-}
-
-.scifi-links {
-  display: flex;
-  gap: 0.8rem;
-  justify-content: center;
-}
-
-.scifi-link {
-  display: inline-flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.6rem 1.2rem;
-  background: linear-gradient(45deg, #00ffff, #ff00ff);
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.stat-row:last-child {
+  margin-bottom: 0;
+}
+
+.stat-label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+}
+
+.stat-value {
+  color: #ffd60a;
+  font-weight: bold;
+  font-size: 1.1rem;
+  text-shadow: 0 0 10px currentColor;
+}
+
+.restart-btn {
+  margin-top: 2rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(45deg, #00ffff, #0099cc);
+  border: none;
+  border-radius: 30px;
   color: #000000;
-  text-decoration: none;
-  border-radius: 25px;
-  font-weight: 600;
-  font-size: 0.8rem;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
   transition: all 0.3s ease;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  box-shadow: 0 5px 20px rgba(0, 255, 255, 0.3);
 }
 
-.scifi-link:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 255, 255, 0.4);
-  background: linear-gradient(45deg, #ff00ff, #00ffff);
+.restart-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(0, 255, 255, 0.5);
+  background: linear-gradient(45deg, #0099cc, #00ffff);
 }
-
-.scifi-link-icon {
-  font-size: 0.9rem;
-}
-
-.scifi-hover-effect {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(45deg, transparent, rgba(0, 255, 255, 0.1), transparent);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-  border-radius: 20px;
-}
-
-.scifi-project-card:hover .scifi-hover-effect {
-  opacity: 1;
-  animation: hoverSweep 0.6s ease-out;
-}
-
-@keyframes hoverSweep {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(100%);
-  }
-}
-
-.scifi-corner-decoration {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border: 2px solid #00ffff;
-  opacity: 0.6;
-}
-
-.scifi-corner-decoration::before,
-.scifi-corner-decoration::after {
-  content: '';
-  position: absolute;
-  background: #00ffff;
-}
-
-.scifi-corner-decoration.top-left {
-  top: 10px;
-  left: 10px;
-  border-right: none;
-  border-bottom: none;
-}
-
-.scifi-corner-decoration.top-right {
-  top: 10px;
-  right: 10px;
-  border-left: none;
-  border-bottom: none;
-}
-
-.scifi-corner-decoration.bottom-left {
-  bottom: 10px;
-  left: 10px;
-  border-right: none;
-  border-top: none;
-}
-
-.scifi-corner-decoration.bottom-right {
-  bottom: 10px;
-  right: 10px;
-  border-left: none;
-  border-top: none;
-}
-
-
 
 /* Project Modal */
 .project-modal {
@@ -832,54 +1516,67 @@ const getCardCurvature = (index) => {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 2000;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(20px);
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease;
+  animation: modalFadeIn 0.3s ease-out;
 }
 
-.project-modal.active {
-  opacity: 1;
-  visibility: visible;
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-.modal-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(5px);
-}
-
-.modal-content {
-  position: relative;
-  background: rgba(20, 20, 30, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.project-card {
+  background: linear-gradient(135deg,
+    rgba(10, 10, 30, 0.95) 0%,
+    rgba(26, 0, 51, 0.95) 50%,
+    rgba(0, 8, 20, 0.95) 100%);
+  border: 2px solid rgba(255, 214, 10, 0.4);
   border-radius: 20px;
   padding: 2.5rem;
   max-width: 600px;
   width: 90%;
   max-height: 80vh;
   overflow-y: auto;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  transform: scale(0.9);
-  transition: transform 0.3s ease;
+  position: relative;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 100px rgba(255, 214, 10, 0.1);
+  animation: cardSlideIn 0.3s ease-out;
 }
 
-.project-modal.active .modal-content {
-  transform: scale(1);
+@keyframes cardSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.modal-close {
-  position: absolute;
-  top: 1.5rem;
-  right: 1.5rem;
+.project-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.project-header h2 {
+  color: #ffd60a;
+  font-size: 2rem;
+  margin: 0;
+  text-shadow: 0 0 20px currentColor;
+}
+
+.close-btn {
   background: none;
   border: none;
   color: rgba(255, 255, 255, 0.8);
@@ -894,240 +1591,218 @@ const getCardCurvature = (index) => {
   justify-content: center;
 }
 
-.modal-close:hover {
+.close-btn:hover {
   color: #ff00ff;
   background: rgba(255, 0, 255, 0.1);
+  transform: rotate(90deg);
 }
 
-.modal-header {
-  text-align: center;
+.project-content {
   margin-bottom: 2rem;
 }
 
-.modal-icon {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2.5rem;
-  margin: 0 auto 1rem;
-  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
-  animation: float 3s ease-in-out infinite;
+.project-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.modal-header h2 {
-  color: #ffffff;
-  font-size: 2rem;
-  margin: 0;
-  background: linear-gradient(45deg, #00ffff, #ff00ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.modal-body {
-  text-align: left;
-}
-
-.modal-description {
-  color: rgba(255, 255, 255, 0.8);
+.project-description {
+  color: rgba(255, 255, 255, 0.9);
   line-height: 1.6;
-  margin-bottom: 2rem;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
 }
 
-.modal-tech {
-  margin-bottom: 2rem;
-}
-
-.modal-tech h3 {
-  color: #00ffff;
-  margin-bottom: 1rem;
-  font-size: 1.2rem;
-}
-
-.tech-tags {
+.project-tech {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
 }
 
-.modal-links h3 {
-  color: #00ffff;
-  margin-bottom: 1rem;
-  font-size: 1.2rem;
+.tech-tag {
+  background: linear-gradient(135deg,
+    rgba(255, 214, 10, 0.1) 0%,
+    rgba(255, 0, 255, 0.1) 100%);
+  border: 1px solid rgba(255, 214, 10, 0.3);
+  color: #ffffff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
 }
 
-.link-buttons {
+.tech-tag:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(255, 214, 10, 0.3);
+  border-color: rgba(255, 214, 10, 0.6);
+}
+
+.project-links {
   display: flex;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
-.modal-link {
+.project-link {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
   padding: 0.8rem 1.5rem;
-  background: linear-gradient(45deg, #00ffff, #ff00ff);
+  background: linear-gradient(45deg, #00ffff, #0099cc);
   color: #000000;
   text-decoration: none;
-  border-radius: 25px;
+  border-radius: 20px;
   font-weight: 600;
   transition: all 0.3s ease;
-  flex: 1;
-  justify-content: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.9rem;
 }
 
-.modal-link:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 255, 255, 0.4);
+.project-link:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(0, 255, 255, 0.5);
+  background: linear-gradient(45deg, #0099cc, #00ffff);
 }
 
-/* Mobile Responsiveness */
+.resume-btn {
+  width: 100%;
+  padding: 1rem 2rem;
+  background: linear-gradient(45deg, #ff00ff, #9900cc);
+  border: none;
+  border-radius: 30px;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 5px 20px rgba(255, 0, 255, 0.3);
+}
+
+.resume-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(255, 0, 255, 0.5);
+  background: linear-gradient(45deg, #9900cc, #ff00ff);
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-  .nav-content {
+  .space-game-section {
     padding: 1rem;
   }
 
-  .nav-links {
+  .game-title {
+    font-size: 2rem;
+  }
+
+  .game-subtitle {
+    font-size: 1rem;
+  }
+
+  .game-stats {
     gap: 1rem;
-    font-size: 0.9rem;
   }
 
-  .projects-header {
-    padding: 6rem 1rem 2rem;
+  .stat {
+    padding: 0.8rem 1.2rem;
   }
 
-  .scifi-grid-section {
+  .stat-value {
+    font-size: 1.5rem;
+  }
+
+  .health-bar-container {
+    position: static;
+    margin-bottom: 1rem;
+  }
+
+  .game-ui {
+    position: static;
     padding: 1rem;
-    perspective: 1000px;
-    min-height: 600px;
   }
 
-  .wireframe-sphere {
-    width: 400px;
-    height: 400px;
+  /* Hide desktop controls on mobile */
+  .desktop-only {
+    display: none;
   }
 
-  .scifi-grid-container {
-    height: 500px;
-    animation: sphereRotate 50s linear infinite;
+  /* Show mobile controls on mobile */
+  .mobile-only {
+    display: block;
   }
 
-  .scifi-project-card {
-    width: 140px;
-    height: 170px;
-    margin-left: -70px;
-    margin-top: -85px;
+  .controls-info {
+    display: none;
   }
 
-  .scifi-icon-bg {
-    width: 40px;
-    height: 40px;
-    font-size: 1.2rem;
+  .mobile-controls {
+    position: absolute;
+    bottom: 1rem;
+    left: 0;
+    right: 0;
+    padding: 0 1rem;
+    justify-content: space-between;
   }
 
-  .scifi-compact {
-    top: 60px;
-    left: 8px;
-    right: 8px;
+  .game-over-screen,
+  .victory-screen,
+  .project-card {
+    margin: 1rem;
+    padding: 2rem 1.5rem;
   }
 
-  .scifi-project-name {
-    font-size: 0.7rem;
-    margin-bottom: 0.4rem;
+  .project-header h2 {
+    font-size: 1.5rem;
   }
 
-  .scifi-tech-tag {
-    font-size: 0.45rem;
-    padding: 0.08rem 0.2rem;
-  }
-
-  .scifi-expanded {
-    padding: 0.8rem;
-    width: 95%;
-  }
-
-  .scifi-description {
-    font-size: 0.75rem;
-  }
-
-  .scifi-link {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.6rem;
+  .project-links {
+    flex-direction: column;
   }
 }
 
 @media (max-width: 480px) {
-  .scifi-grid-section {
-    padding: 0.5rem;
-    perspective: 800px;
-    min-height: 500px;
+  .game-title {
+    font-size: 1.5rem;
   }
 
-  .wireframe-sphere {
-    width: 300px;
-    height: 300px;
+  .stat-value {
+    font-size: 1.2rem;
   }
 
-  .sphere-core {
-    width: 40px;
-    height: 40px;
+  .mobile-controls {
+    bottom: 0.5rem;
+    padding: 0 0.5rem;
   }
 
-  .scifi-grid-container {
-    height: 400px;
-    animation: sphereRotate 60s linear infinite;
+  .movement-controls {
+    gap: 0.5rem;
   }
 
-  .scifi-project-card {
-    width: 120px;
-    height: 150px;
-    margin-left: -60px;
-    margin-top: -75px;
-  }
-
-  .scifi-icon-bg {
-    width: 35px;
-    height: 35px;
+  .move-btn {
+    width: 45px;
+    height: 45px;
     font-size: 1rem;
   }
 
-  .scifi-compact {
-    top: 50px;
-    left: 6px;
-    right: 6px;
+  .fire-btn {
+    width: 70px;
+    height: 40px;
+    font-size: 0.8rem;
   }
 
-  .scifi-project-name {
-    font-size: 0.6rem;
-    margin-bottom: 0.3rem;
+  .btn-icon {
+    font-size: 1.3rem;
   }
 
-  .scifi-tech-tag {
-    font-size: 0.4rem;
-    padding: 0.06rem 0.15rem;
-  }
-
-  .scifi-expanded {
-    padding: 0.6rem;
-  }
-
-  .scifi-description {
+  .btn-label {
     font-size: 0.7rem;
-    line-height: 1.3;
-  }
-
-  .scifi-link {
-    padding: 0.3rem 0.6rem;
-    font-size: 0.55rem;
-  }
-
-  .scifi-links {
-    flex-direction: column;
-    gap: 0.4rem;
   }
 }
 </style>
