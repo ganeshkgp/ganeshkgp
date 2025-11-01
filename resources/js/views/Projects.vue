@@ -173,76 +173,47 @@ let images = {
 }
 let imagesLoaded = false
 
-// Enhanced projects data for asteroids
-const projects = ref([
-  {
-    id: 1,
-    name: 'Commerce Asteroid',
-    description: 'An e-commerce platform with full shopping cart, payment integration, and admin dashboard. Built with Laravel and Vue.js.',
-    image: 'https://via.placeholder.com/400x300/0a0a0a/00ffff?text=E-Commerce',
-    technologies: ['Laravel', 'Vue.js', 'MySQL', 'Redis', 'Stripe'],
-    live_url: 'https://example-ecommerce.com',
-    github_url: 'https://github.com/example/ecommerce',
-    demo_url: 'https://demo-ecommerce.com',
-    maxHealth: 3,
-    color: '#00ffff'
-  },
-  {
-    id: 2,
-    name: 'Banking Asteroid',
-    description: 'Mobile banking application with secure transactions, biometric authentication, and real-time notifications.',
-    image: 'https://via.placeholder.com/400x300/0a0a0a/ff00ff?text=Banking',
-    technologies: ['Flutter', 'Node.js', 'PostgreSQL', 'JWT'],
-    live_url: 'https://example-banking.com',
-    github_url: 'https://github.com/example/banking',
-    maxHealth: 4,
-    color: '#ff00ff'
-  },
-  {
-    id: 3,
-    name: 'Game Asteroid',
-    description: 'Unity multiplayer game with real-time physics, custom networking, and cross-platform support.',
-    image: 'https://via.placeholder.com/400x300/0a0a0a/ffff00?text=Mobile+Game',
-    technologies: ['Unity', 'C#', 'WebSocket', 'Redis'],
-    live_url: 'https://example-game.com',
-    github_url: 'https://github.com/example/game',
-    maxHealth: 5,
-    color: '#ffff00'
-  },
-  {
-    id: 4,
-    name: 'Analytics Asteroid',
-    description: 'AI-powered analytics dashboard with machine learning insights and real-time data visualization.',
-    image: 'https://via.placeholder.com/400x300/0a0a0a/00ff00?text=Analytics',
-    technologies: ['Python', 'Vue.js', 'TensorFlow', 'D3.js'],
-    live_url: 'https://example-analytics.com',
-    github_url: 'https://github.com/example/analytics',
-    maxHealth: 3,
-    color: '#00ff00'
-  },
-  {
-    id: 5,
-    name: 'Social Asteroid',
-    description: 'Social media platform with real-time messaging, content sharing, and community features.',
-    image: 'https://via.placeholder.com/400x300/0a0a0a/ff6b6b?text=Social+Network',
-    technologies: ['Laravel', 'Vue.js', 'Socket.io', 'MySQL'],
-    live_url: 'https://example-social.com',
-    github_url: 'https://github.com/example/social',
-    maxHealth: 4,
-    color: '#ff6b6b'
-  },
-  {
-    id: 6,
-    name: 'IoT Asteroid',
-    description: 'Smart home automation system with IoT device control and environmental monitoring.',
-    image: 'https://via.placeholder.com/400x300/0a0a0a/4ecdc4?text=IoT+System',
-    technologies: ['Flutter', 'Python', 'MQTT', 'Raspberry Pi'],
-    live_url: 'https://example-iot.com',
-    github_url: 'https://github.com/example/iot',
-    maxHealth: 3,
-    color: '#4ecdc4'
+// Projects data for asteroids
+const projects = ref([])
+
+// Fetch projects from API
+const fetchProjects = async () => {
+  try {
+    const response = await fetch('/api/v1/home/projects')
+    const projectsData = await response.json()
+
+    // Transform project data for asteroids
+    projects.value = projectsData.map((project, index) => ({
+      id: project.id,
+      name: project.name,
+      description: project.description,
+      image: project.image || `https://via.placeholder.com/400x300/0a0a0a/${encodeURIComponent(project.color || '#00ffff').replace('#', '')}?text=${encodeURIComponent(project.name)}`,
+      technologies: project.technologies || [],
+      live_url: project.live_url,
+      github_url: project.github_url,
+      demo_url: project.demo_url,
+      maxHealth: project.maxHealth || 3,
+      color: project.color || '#00ffff'
+    }))
+  } catch (error) {
+    console.error('Error fetching projects:', error)
+    // Fallback to default data
+    projects.value = [
+      {
+        id: 1,
+        name: 'Sample Project',
+        description: 'A sample project placeholder',
+        image: 'https://via.placeholder.com/400x300/0a0a0a/00ffff?text=Sample',
+        technologies: ['Vue.js', 'Laravel'],
+        live_url: '#',
+        github_url: '#',
+        demo_url: '#',
+        maxHealth: 3,
+        color: '#00ffff'
+      }
+    ]
   }
-])
+}
 
 // Load game images
 const loadImages = async () => {
@@ -1040,6 +1011,7 @@ const restartGame = () => {
 // Initialize game
 onMounted(async () => {
   await nextTick()
+  await fetchProjects()
   await initGame()
   animate()
 

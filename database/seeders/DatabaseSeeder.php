@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             SkillSeeder::class,
             ProjectSeeder::class,
+            ServiceSeeder::class,
         ]);
 
         // Create an admin user for testing

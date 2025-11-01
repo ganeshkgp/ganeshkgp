@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\SkillController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\MediaController;
+use App\Http\Controllers\Api\HomeController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -29,6 +30,13 @@ Route::prefix('v1')->group(function () {
 
     // Skills
     Route::get('/skills', [SkillController::class, 'index']);
+
+    // Home API for frontend data
+    Route::get('/home', [HomeController::class, 'index']);
+    Route::get('/home/projects', [HomeController::class, 'projects']);
+    Route::get('/home/services', [HomeController::class, 'services']);
+    Route::get('/home/planets', [HomeController::class, 'planets']);
+    Route::post('/home/contact', [HomeController::class, 'storeContact']);
 
     // Contact
     Route::post('/contact', [ContactController::class, 'store']);

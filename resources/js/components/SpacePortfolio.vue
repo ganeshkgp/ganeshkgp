@@ -158,226 +158,8 @@ let animationId
 const raycaster = new THREE.Raycaster()
 const mouse = new THREE.Vector2()
 
-// Celestial bodies data representing different skills/experience
-const planetsData = [
-  {
-    id: 1,
-    name: 'Mercury Terminal',
-    subtitle: 'Microservices & APIs',
-    icon: '🚀',
-    color: '#8c8c8c',
-    position: { x: 6, y: 0, z: 0 },
-    size: 1.2,
-    experience: 1,
-    description: 'Building microservices and API systems with Node.js and Express. Creating scalable backend architectures with real-time communication and comprehensive testing.',
-    technologies: ['Node.js', 'Express', 'GraphQL', 'WebSocket', 'PostgreSQL'],
-    projects: [
-      {
-        id: 1,
-        name: 'API Gateway',
-        description: 'Microservices API gateway with authentication',
-        link: 'https://example.com/api-gateway',
-        technologies: ['Node.js', 'JWT', 'Redis']
-      }
-    ]
-  },
-  {
-    id: 2,
-    name: 'Vue.js Nebula',
-    subtitle: 'Frontend Development',
-    icon: '⚛️',
-    color: '#42b883',
-    position: { x: 10, y: 0, z: 0 },
-    size: 2.5,
-    experience: 4,
-    description: 'Mastering the reactive universe of Vue.js. Building scalable, performant frontend applications with modern composition API, state management, and ecosystem integration.',
-    technologies: ['Vue.js', 'Vuex', 'Pinia', 'Vue Router', 'Nuxt.js', 'Vite'],
-    projects: [
-      {
-        id: 2,
-        name: 'E-Commerce Platform',
-        description: 'Full-stack e-commerce with real-time inventory',
-        link: 'https://example.com/ecommerce',
-        technologies: ['Vue.js', 'Laravel', 'MySQL']
-      },
-      {
-        id: 3,
-        name: 'Admin Dashboard',
-        description: 'Analytics dashboard with real-time data',
-        link: 'https://example.com/dashboard',
-        technologies: ['Vue.js', 'Chart.js', 'WebSocket']
-      }
-    ]
-  },
-  {
-    id: 3,
-    name: 'Laravel Galaxy',
-    subtitle: 'Backend Development',
-    icon: '🔧',
-    color: '#ff2d20',
-    position: { x: 15, y: 0, z: 0 },
-    size: 3,
-    experience: 5,
-    description: 'Architecting robust backend systems with Laravel. Building RESTful APIs, microservices, and enterprise-level applications with elegant code and comprehensive testing.',
-    technologies: ['Laravel', 'PHP', 'MySQL', 'Redis', 'Docker', 'API Platform'],
-    projects: [
-      {
-        id: 4,
-        name: 'CMS Platform',
-        description: 'Enterprise content management system',
-        link: 'https://example.com/cms',
-        technologies: ['Laravel', 'Vue.js', 'MySQL']
-      }
-    ]
-  },
-  {
-    id: 4,
-    name: 'Dynamo Database Cluster',
-    subtitle: 'Database Design',
-    icon: '💾',
-    color: '#4a90e2',
-    position: { x: 20, y: 0, z: 0 },
-    size: 2.8,
-    experience: 4,
-    description: 'Designing and optimizing database architectures for maximum performance. Working with SQL and NoSQL databases, query optimization, and data modeling.',
-    technologies: ['PostgreSQL', 'MySQL', 'MongoDB', 'Redis', 'Elasticsearch'],
-    projects: [
-      {
-        id: 5,
-        name: 'Data Pipeline',
-        description: 'Real-time data processing and analytics',
-        link: 'https://example.com/data-pipeline',
-        technologies: ['PostgreSQL', 'Python', 'Apache Kafka']
-      }
-    ]
-  },
-  {
-    id: 5,
-    name: 'Flutter Cosmos',
-    subtitle: 'Mobile Development',
-    icon: '📱',
-    color: '#02569b',
-    position: { x: 25, y: 0, z: 0 },
-    size: 2.2,
-    experience: 3,
-    description: 'Creating beautiful cross-platform mobile experiences with Flutter. Building native-performance apps with beautiful UIs and seamless backend integration.',
-    technologies: ['Flutter', 'Dart', 'Firebase', 'BLoC', 'Provider', 'HTTP'],
-    projects: [
-      {
-        id: 6,
-        name: 'Banking App',
-        description: 'Secure mobile banking with biometric auth',
-        link: 'https://example.com/banking',
-        technologies: ['Flutter', 'Node.js', 'PostgreSQL']
-      }
-    ]
-  },
-  {
-    id: 6,
-    name: 'Unity Rings',
-    subtitle: 'Game Development',
-    icon: '🎮',
-    color: '#000000',
-    position: { x: 30, y: 0, z: 0 },
-    size: 2.8,
-    experience: 2,
-    description: 'Crafting immersive gaming experiences with Unity. Developing 2D/3D games with physics simulation, multiplayer capabilities, and stunning visual effects.',
-    technologies: ['Unity', 'C#', 'Blender', 'Photon', 'ARCore', 'Vuforia'],
-    projects: [
-      {
-        id: 7,
-        name: 'AR Puzzle Game',
-        description: 'Augmented reality puzzle game',
-        link: 'https://example.com/ar-game',
-        technologies: ['Unity', 'C#', 'ARCore']
-      }
-    ]
-  },
-  {
-    id: 7,
-    name: 'Saturn Systems',
-    subtitle: 'System Architecture',
-    icon: '⚙️',
-    color: '#f4e7d7',
-    position: { x: 40, y: 0, z: 0 },
-    size: 2.6,
-    experience: 3,
-    description: 'Designing complex system architectures and microservices. Building scalable, maintainable systems with proper separation of concerns and enterprise patterns.',
-    technologies: ['Docker', 'Kubernetes', 'Nginx', 'Load Balancing', 'CI/CD'],
-    projects: [
-      {
-        id: 8,
-        name: 'Microservice Platform',
-        description: 'Distributed microservices architecture',
-        link: 'https://example.com/microservices',
-        technologies: ['Docker', 'Kubernetes', 'gRPC']
-      }
-    ]
-  },
-  {
-    id: 8,
-    name: 'Neptune AI Sphere',
-    subtitle: 'AI & Machine Learning',
-    icon: '🤖',
-    color: '#3776ab',
-    position: { x: 50, y: 0, z: 0 },
-    size: 2.4,
-    experience: 1.5,
-    description: 'Exploring the AI universe with Python and machine learning. Building intelligent systems with neural networks, computer vision, and natural language processing.',
-    technologies: ['Python', 'TensorFlow', 'PyTorch', 'OpenCV', 'FastAPI', 'Pandas'],
-    projects: [
-      {
-        id: 9,
-        name: 'AI Chat System',
-        description: 'Intelligent chatbot with NLP',
-        link: 'https://example.com/ai-chat',
-        technologies: ['Python', 'TensorFlow', 'React']
-      }
-    ]
-  },
-  {
-    id: 9,
-    name: 'Pluto Dwarf Planet',
-    subtitle: 'IoT & Embedded Systems',
-    icon: '🔌',
-    color: '#d4a76a',
-    position: { x: 55, y: 0, z: 0 },
-    size: 1.5,
-    experience: 2,
-    description: 'Programming the Internet of Things with embedded systems. Creating smart devices, sensor networks, and edge computing solutions for real-world applications.',
-    technologies: ['Arduino', 'Raspberry Pi', 'ESP32', 'MQTT', 'Embedded C/C++', 'Node-RED'],
-    projects: [
-      {
-        id: 10,
-        name: 'Smart Home System',
-        description: 'IoT home automation with voice control',
-        link: 'https://example.com/smart-home',
-        technologies: ['Raspberry Pi', 'Python', 'MQTT']
-      }
-    ]
-  },
-  {
-    id: 10,
-    name: 'Cygnus Cloud Cluster',
-    subtitle: 'DevOps & Cloud',
-    icon: '☁️',
-    color: '#ff9900',
-    position: { x: 60, y: 0, z: 0 },
-    size: 2.3,
-    experience: 3,
-    description: 'Navigating the cloud infrastructure with AWS and major cloud providers. Building scalable, reliable deployment pipelines with CI/CD automation and comprehensive monitoring.',
-    technologies: ['AWS', 'Azure', 'Google Cloud', 'Terraform', 'Monitoring', 'Serverless'],
-    projects: [
-      {
-        id: 11,
-        name: 'Cloud Infrastructure',
-        description: 'Multi-cloud deployment system',
-        link: 'https://example.com/cloud-infra',
-        technologies: ['AWS', 'Docker', 'Kubernetes']
-      }
-    ]
-  }
-]
+// Celestial bodies data from services API
+const planetsData = ref([])
 
 // Sun data
 const sunData = {
@@ -414,10 +196,47 @@ const checkMobile = () => {
   isMobile.value = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768
 }
 
-onMounted(() => {
+// Fetch planets data from services API
+const fetchPlanets = async () => {
+  try {
+    const response = await fetch('/api/v1/home/planets')
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    const planetsDataResponse = await response.json()
+
+    // Set planets data from API
+    planetsData.value = planetsDataResponse
+    totalPlanets.value = planetsData.value.length
+    console.log(`Loaded ${planetsData.value.length} planets from services`)
+  } catch (error) {
+    console.error('Error fetching planets:', error)
+    // Fallback to demo data if API fails
+    planetsData.value = [
+      {
+        id: 1,
+        name: 'Demo Service',
+        subtitle: 'Service Expertise',
+        icon: '⚛️',
+        color: '#42b883',
+        position: { x: 10, y: 0, z: 0 },
+        size: 2.5,
+        experience: 4,
+        description: 'A sample service demonstrating the space portfolio functionality',
+        technologies: ['Vue.js', 'JavaScript', 'CSS'],
+        projects: []
+      }
+    ]
+    totalPlanets.value = planetsData.value.length
+    console.log('Using fallback demo data')
+  }
+}
+
+onMounted(async () => {
   checkMobile()
-  totalPlanets.value = planetsData.length
-  if (spaceContainer.value && sceneContainer.value) {
+  await fetchPlanets()
+
+  if (spaceContainer.value && sceneContainer.value && planetsData.value.length > 0) {
     initSpaceScene()
   }
 })
@@ -513,7 +332,7 @@ const setupSpaceLighting = () => {
   scene.add(ambientLight)
 
   // Add point lights for each planet (representing reflected starlight)
-  planetsData.forEach((planetData, index) => {
+  planetsData.value.forEach((planetData, index) => {
     const planetLight = new THREE.PointLight(planetData.color, 0.5, planetData.size * 3)
     planetLight.position.set(planetData.position.x, planetData.position.y, planetData.position.z)
     scene.add(planetLight)
@@ -554,7 +373,7 @@ const createStars = () => {
 }
 
 const createPlanets = () => {
-  planetsData.forEach((planetData, index) => {
+  planetsData.value.forEach((planetData, index) => {
     const planetGroup = new THREE.Group()
 
     // Create planet with realistic surface
@@ -588,7 +407,7 @@ const createPlanets = () => {
 
     // Position planet in orbital ring around sun
     const orbitRadius = 8 + (index * 4) // Increasing orbital radius
-    const orbitAngle = (index / planetsData.length) * Math.PI * 2 // Spread evenly around circle
+    const orbitAngle = (index / planetsData.value.length) * Math.PI * 2 // Spread evenly around circle
     const height = (Math.random() - 0.5) * 1 // Slight vertical variation
 
     planetGroup.position.set(
@@ -1732,7 +1551,7 @@ const createAsteroidBelt = () => {
 }
 
 const createOrbitalRings = () => {
-  planetsData.forEach((planetData, index) => {
+  planetsData.value.forEach((planetData, index) => {
     const orbitRadius = 8 + (index * 4)
 
     // Create orbital ring geometry with subtle gaps for better visual effect
@@ -2062,9 +1881,11 @@ const animate = () => {
 const cleanup = () => {
   if (animationId) {
     cancelAnimationFrame(animationId)
+    animationId = null
   }
   if (renderer) {
     renderer.dispose()
+    renderer = null
   }
 
   // Clean up arrays
