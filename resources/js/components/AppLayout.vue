@@ -9,6 +9,7 @@
         <div class="nav-links">
           <router-link to="/" class="nav-link">Work</router-link>
           <router-link to="/projects" class="nav-link">Projects</router-link>
+          <router-link to="/blogs" class="nav-link">Blog</router-link>
           <router-link to="/contact" class="nav-link">Contact</router-link>
         </div>
       </div>

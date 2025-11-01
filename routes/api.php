@@ -36,7 +36,10 @@ Route::prefix('v1')->group(function () {
     Route::get('/home/projects', [HomeController::class, 'projects']);
     Route::get('/home/services', [HomeController::class, 'services']);
     Route::get('/home/planets', [HomeController::class, 'planets']);
+    Route::get('/home/blogs', [HomeController::class, 'blogs']);
+    Route::get('/home/blogs/{slug}', [HomeController::class, 'blogDetails']);
     Route::post('/home/contact', [HomeController::class, 'storeContact']);
+    Route::post('/home/blogs/generate', [HomeController::class, 'generateBlogPost']);
 
     // Contact
     Route::post('/contact', [ContactController::class, 'store']);

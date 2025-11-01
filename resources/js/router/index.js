@@ -18,6 +18,22 @@ const routes = [
     }
   },
   {
+    path: '/blogs',
+    name: 'Blogs',
+    component: () => import('../views/Blogs.vue'),
+    meta: {
+      title: 'Tech Blog | Ganesh K P'
+    }
+  },
+  {
+    path: '/blog/:slug',
+    name: 'BlogDetails',
+    component: () => import('../views/BlogDetails.vue'),
+    meta: {
+      title: 'Blog Article | Ganesh K P'
+    }
+  },
+  {
     path: '/contact',
     name: 'Contact',
     component: () => import('../views/Contact.vue'),
