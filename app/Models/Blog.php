@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Blog extends Model
 {
@@ -23,6 +24,8 @@ class Blog extends Model
         'is_featured',
         'published_at',
         'sort_order',
+        'likes_count',
+        'comments_count',
     ];
 
     protected $casts = [
@@ -73,6 +76,62 @@ class Blog extends Model
     {
         $wordCount = str_word_count(strip_tags($this->content));
         return max(1, ceil($wordCount / 200)); // 200 words per minute
+    }
+
+    /**
+     * Get the comments for the blog.
+     */
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    /**
+     * Get the approved comments for the blog.
+     */
+    public function approvedComments(): HasMany
+    {
+        return $this->comments()->approved();
+    }
+
+    /**
+     * Get the likes for the blog.
+     */
+    public function likes(): HasMany
+    {
+        return $this->hasMany(BlogLike::class);
+    }
+
+    /**
+     * Check if the blog is liked by the current user or IP.
+     */
+    public function isLikedBy($user = null, $ipAddress = null): bool
+    {
+        if ($user) {
+            return $this->likes()->where('user_id', $user->id)->exists();
+        }
+
+        if ($ipAddress) {
+            return $this->likes()->where('ip_address', $ipAddress)->exists();
+        }
+
+        return false;
+    }
+
+    /**
+     * Add a fake number to likes count.
+     */
+    public function getLikesWithFakeCountAttribute(): int
+    {
+        return $this->likes_count + rand(50, 500);
+    }
+
+    /**
+     * Add a fake number to comments count.
+     */
+    public function getCommentsWithFakeCountAttribute(): int
+    {
+        return $this->comments_count + rand(20, 200);
     }
 
     /**

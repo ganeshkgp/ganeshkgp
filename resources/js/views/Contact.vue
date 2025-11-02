@@ -1,103 +1,103 @@
 <template>
   <AppLayout>
-    <div class="contact-container">
+    <div class="min-h-screen p-8 mx-auto max-w-7xl flex flex-col">
       <!-- Header -->
-      <div class="contact-header">
-        <h1 class="hero-title">
-          <span class="title-line">Let's Build</span>
-          <span class="title-line gradient-text">Something Amazing</span>
+      <div class="text-center mb-8">
+        <h1 class="font-black text-4xl lg:text-6xl leading-tight mb-4">
+          <span class="block">Let's Build</span>
+          <span class="block bg-gradient-to-r from-purple-500 to-yellow-500 bg-clip-text text-transparent animate-pulse">Something Amazing</span>
         </h1>
-        <p class="hero-subtitle">
+        <p class="text-lg text-white/70 leading-relaxed max-w-xl mx-auto">
           I'm always excited to work on innovative projects. Whether you have a specific need or just want to chat about technology, I'm here to help.
         </p>
       </div>
 
       <!-- Main Content Grid -->
-      <div class="contact-main-grid">
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 flex-1 items-start">
         <!-- Contact Form Section -->
-        <div class="form-section">
-          <div class="section-title">
-            <h2>Get In Touch</h2>
+        <div class="lg:col-span-3 bg-black/50 border border-yellow-500/20 rounded-2xl p-6 backdrop-blur-lg h-fit">
+          <div class="mb-6">
+            <h2 class="text-2xl font-semibold mb-2 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">Get In Touch</h2>
           </div>
           <ContactForm />
         </div>
 
         <!-- Contact Info Section -->
-        <div class="info-section">
-          <div class="section-title">
-            <h2>Connect With Me</h2>
+        <div class="lg:col-span-2 flex flex-col gap-6">
+          <div class="mb-6">
+            <h2 class="text-2xl font-semibold mb-2 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">Connect With Me</h2>
           </div>
 
-          <div class="contact-methods">
-            <div class="contact-method">
-              <div class="method-icon">📧</div>
-              <div class="method-info">
-                <h3>Email</h3>
-                <a href="mailto:ganeshr848@gmail.com">ganeshr848@gmail.com</a>
+          <div class="flex flex-col gap-3">
+            <div class="flex items-center gap-3 p-3 bg-black/50 border border-yellow-500/20 rounded-lg transition-all duration-300 hover:border-purple-500/30 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/10">
+              <div class="text-2xl w-10 h-10 flex items-center justify-center bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full text-black flex-shrink-0">📧</div>
+              <div class="flex-1">
+                <h3 class="text-cyan-400 mb-1 text-sm font-medium">Email</h3>
+                <a href="mailto:ganeshr848@gmail.com" class="text-white/70 hover:text-cyan-400 transition-colors duration-300 text-sm">ganeshr848@gmail.com</a>
               </div>
             </div>
 
-            <div class="contact-method">
-              <div class="method-icon">💼</div>
-              <div class="method-info">
-                <h3>LinkedIn</h3>
-                <a href="#" target="_blank">linkedin.com/in/ganeshkp</a>
+            <div class="flex items-center gap-3 p-3 bg-black/50 border border-yellow-500/20 rounded-lg transition-all duration-300 hover:border-purple-500/30 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/10">
+              <div class="text-2xl w-10 h-10 flex items-center justify-center bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full text-black flex-shrink-0">💼</div>
+              <div class="flex-1">
+                <h3 class="text-cyan-400 mb-1 text-sm font-medium">LinkedIn</h3>
+                <a href="#" target="_blank" class="text-white/70 hover:text-cyan-400 transition-colors duration-300 text-sm">linkedin.com/in/ganeshkp</a>
               </div>
             </div>
 
-            <div class="contact-method">
-              <div class="method-icon">🐙</div>
-              <div class="method-info">
-                <h3>GitHub</h3>
-                <a href="#" target="_blank">github.com/ganeshkgp</a>
+            <div class="flex items-center gap-3 p-3 bg-black/50 border border-yellow-500/20 rounded-lg transition-all duration-300 hover:border-purple-500/30 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/10">
+              <div class="text-2xl w-10 h-10 flex items-center justify-center bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full text-black flex-shrink-0">🐙</div>
+              <div class="flex-1">
+                <h3 class="text-cyan-400 mb-1 text-sm font-medium">GitHub</h3>
+                <a href="#" target="_blank" class="text-white/70 hover:text-cyan-400 transition-colors duration-300 text-sm">github.com/ganeshkgp</a>
               </div>
             </div>
 
-            <div class="contact-method">
-              <div class="method-icon">🌍</div>
-              <div class="method-info">
-                <h3>Location</h3>
-                <p>Remote work worldwide</p>
+            <div class="flex items-center gap-3 p-3 bg-black/50 border border-yellow-500/20 rounded-lg transition-all duration-300 hover:border-purple-500/30 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/10">
+              <div class="text-2xl w-10 h-10 flex items-center justify-center bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full text-black flex-shrink-0">🌍</div>
+              <div class="flex-1">
+                <h3 class="text-cyan-400 mb-1 text-sm font-medium">Location</h3>
+                <p class="text-white/70 text-sm">Remote work worldwide</p>
               </div>
             </div>
           </div>
 
-          <!-- Response Time -->
-          <div class="response-time">
-            <div class="response-icon">⚡</div>
-            <div class="response-info">
-              <h3>Response Time</h3>
-              <p>Usually within 24 hours</p>
+        <!-- Response Time -->
+          <div class="flex items-center gap-3 p-4 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-purple-500/30 rounded-lg">
+            <div class="text-2xl">⚡</div>
+            <div class="flex-1">
+              <h3 class="text-purple-400 mb-1 text-sm font-medium">Response Time</h3>
+              <p class="text-white/70 text-sm">Usually within 24 hours</p>
             </div>
           </div>
 
           <!-- Skills -->
           <div class="skills-section">
-            <h3>Skills & Expertise</h3>
-            <div class="skills-grid">
-              <div class="skill-item">
-                <div class="skill-icon">🐘</div>
-                <h4>PHP/Laravel</h4>
+            <h3 class="text-yellow-500 mb-4 text-lg font-medium">Skills & Expertise</h3>
+            <div class="grid grid-cols-3 gap-3">
+              <div class="bg-black/50 border border-yellow-500/20 rounded-lg p-3 text-center transition-all duration-300 hover:border-purple-500/30 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/10 backdrop-blur-lg">
+                <div class="text-2xl mb-1">🐘</div>
+                <h4 class="text-cyan-400 text-xs font-medium">PHP/Laravel</h4>
               </div>
-              <div class="skill-item">
-                <div class="skill-icon">💚</div>
-                <h4>Vue.js/React</h4>
+              <div class="bg-black/50 border border-yellow-500/20 rounded-lg p-3 text-center transition-all duration-300 hover:border-purple-500/30 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/10 backdrop-blur-lg">
+                <div class="text-2xl mb-1">💚</div>
+                <h4 class="text-cyan-400 text-xs font-medium">Vue.js/React</h4>
               </div>
-              <div class="skill-item">
-                <div class="skill-icon">📱</div>
-                <h4>Flutter</h4>
+              <div class="bg-black/50 border border-yellow-500/20 rounded-lg p-3 text-center transition-all duration-300 hover:border-purple-500/30 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/10 backdrop-blur-lg">
+                <div class="text-2xl mb-1">📱</div>
+                <h4 class="text-cyan-400 text-xs font-medium">Flutter</h4>
               </div>
-              <div class="skill-item">
-                <div class="skill-icon">🐍</div>
-                <h4>Python</h4>
+              <div class="bg-black/50 border border-yellow-500/20 rounded-lg p-3 text-center transition-all duration-300 hover:border-purple-500/30 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/10 backdrop-blur-lg">
+                <div class="text-2xl mb-1">🐍</div>
+                <h4 class="text-cyan-400 text-xs font-medium">Python</h4>
               </div>
-              <div class="skill-item">
-                <div class="skill-icon">🎮</div>
-                <h4>Unity</h4>
+              <div class="bg-black/50 border border-yellow-500/20 rounded-lg p-3 text-center transition-all duration-300 hover:border-purple-500/30 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/10 backdrop-blur-lg">
+                <div class="text-2xl mb-1">🎮</div>
+                <h4 class="text-cyan-400 text-xs font-medium">Unity</h4>
               </div>
-              <div class="skill-item">
-                <div class="skill-icon">☁️</div>
-                <h4>Cloud & DevOps</h4>
+              <div class="bg-black/50 border border-yellow-500/20 rounded-lg p-3 text-center transition-all duration-300 hover:border-purple-500/30 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/10 backdrop-blur-lg">
+                <div class="text-2xl mb-1">☁️</div>
+                <h4 class="text-cyan-400 text-xs font-medium">Cloud & DevOps</h4>
               </div>
             </div>
           </div>
@@ -105,8 +105,11 @@
       </div>
 
       <!-- Bottom CTA -->
-      <div class="bottom-cta">
-        <router-link to="/projects" class="btn-primary">View My Work</router-link>
+      <div class="text-center mt-8 pt-6 border-t border-yellow-500/20">
+        <p class="mb-4 text-white/80">Ready to start your next project? Let's create something remarkable together!</p>
+        <router-link to="/projects" class="inline-block bg-gradient-to-r from-yellow-500 to-purple-500 text-black px-8 py-3 rounded-lg font-semibold text-base transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-yellow-500/30 uppercase tracking-wide">
+          View My Work
+        </router-link>
       </div>
     </div>
   </AppLayout>

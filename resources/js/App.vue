@@ -47,12 +47,10 @@ onMounted(() => {
   -moz-osx-font-smoothing: grayscale;
   width: 100%;
   height: 100vh;
-  overflow: hidden;
 }
 
 * {
-  margin: 0;
-  padding: 0;
+
   box-sizing: border-box;
 }
 

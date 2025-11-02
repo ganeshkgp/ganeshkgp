@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\SkillController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\MediaController;
 use App\Http\Controllers\Api\HomeController;
+use App\Http\Controllers\Api\ScraperController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -41,8 +42,18 @@ Route::prefix('v1')->group(function () {
     Route::post('/home/contact', [HomeController::class, 'storeContact']);
     Route::post('/home/blogs/generate', [HomeController::class, 'generateBlogPost']);
 
+    // Blog Comments and Likes
+    Route::post('/blogs/{slug}/like', [HomeController::class, 'likeBlog']);
+    Route::post('/blogs/{slug}/comments', [HomeController::class, 'storeComment']);
+    Route::get('/blogs/{slug}/comments', [HomeController::class, 'getComments']);
+    Route::post('/comments/{comment}/like', [HomeController::class, 'likeComment']);
+    Route::post('/comments/{comment}/reply', [HomeController::class, 'replyToComment']);
+
     // Contact
     Route::post('/contact', [ContactController::class, 'store']);
+
+    // Scraper (Public read-only)
+    Route::get('/scraper/feeds', [ScraperController::class, 'getAvailableFeeds']);
 });
 
 // Protected API Routes (require authentication)
@@ -70,4 +81,22 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::post('/media', [MediaController::class, 'store']);
     Route::get('/media/{id}', [MediaController::class, 'show']);
     Route::delete('/media/{filename}', [MediaController::class, 'destroy']);
+
+  // Scraper Management (Protected)
+    Route::post('/scraper/article', [ScraperController::class, 'scrapeArticle']);
+    Route::post('/scraper/multiple', [ScraperController::class, 'scrapeMultiple']);
+});
+
+
+Route::get('/clear-cache', function() {
+    $exitCode = Artisan::call('cache:clear');
+    return 'Cache cleared';
+});
+
+Route::get('test-email', function() {
+    Mail::raw('This is a test email from Laravel', function ($message) {
+        $message->to('ganeshr848@gmail.com')
+                ->subject('Laravel SMTP test');
+    });
+    return 'Test email sent (check recipient)';
 });

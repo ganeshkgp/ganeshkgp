@@ -8,7 +8,11 @@ use App\Models\Project;
 use App\Models\Service;
 use App\Models\Contact;
 use App\Models\Blog;
+use App\Models\Comment;
+use App\Models\BlogLike;
+use App\Models\CommentLike;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
@@ -132,8 +136,8 @@ class HomeController extends Controller
                 ],
                 'stats' => [
                     'views' => mt_rand(100, 5000),
-                    'likes' => mt_rand(20, 200),
-                    'comments' => mt_rand(5, 50)
+                    'likes' => $blog->likes_with_fake_count,
+                    'comments' => $blog->comments_with_fake_count
                 ]
             ];
         });
@@ -197,8 +201,8 @@ class HomeController extends Controller
             ],
             'stats' => [
                 'views' => mt_rand(100, 5000),
-                'likes' => mt_rand(20, 200),
-                'comments' => mt_rand(5, 50)
+                'likes' => $blog->likes_with_fake_count,
+                'comments' => $blog->comments_with_fake_count
             ],
             'table_of_contents' => $this->generateTableOfContents($blog->content),
             'related_posts' => $this->getRelatedPosts($blog)
@@ -677,6 +681,220 @@ const BlogComponent = () => {\n  const [posts, setPosts] = useState([]);\n  \n  
     public function update(Request $request, string $id)
     {
         return response()->json(['message' => 'Method not implemented'], 501);
+    }
+
+    /**
+     * Like or unlike a blog post
+     */
+    public function likeBlog($slug)
+    {
+        $blog = Blog::where('slug', $slug)->first();
+
+        if (!$blog) {
+            return response()->json(['error' => 'Blog not found'], 404);
+        }
+
+        $user = Auth::user();
+        $ipAddress = request()->ip();
+
+        // Check if already liked
+        $existingLike = BlogLike::where('blog_id', $blog->id)
+            ->where(function ($query) use ($user, $ipAddress) {
+                $query->where('user_id', $user?->id)
+                      ->orWhere('ip_address', $ipAddress);
+            })
+            ->first();
+
+        if ($existingLike) {
+            // Unlike
+            $existingLike->delete();
+            $blog->decrement('likes_count');
+            $liked = false;
+        } else {
+            // Like
+            BlogLike::create([
+                'blog_id' => $blog->id,
+                'user_id' => $user?->id,
+                'ip_address' => $ipAddress,
+            ]);
+            $blog->increment('likes_count');
+            $liked = true;
+        }
+
+        return response()->json([
+            'success' => true,
+            'liked' => $liked,
+            'likes_count' => $blog->likes_with_fake_count,
+        ]);
+    }
+
+    /**
+     * Store a new comment
+     */
+    public function storeComment(Request $request, $slug)
+    {
+        $blog = Blog::where('slug', $slug)->first();
+
+        if (!$blog) {
+            return response()->json(['error' => 'Blog not found'], 404);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'content' => 'required|string|max:2000',
+            'parent_id' => 'nullable|exists:comments,id',
+        ]);
+
+        $comment = Comment::create([
+            'blog_id' => $blog->id,
+            'user_id' => Auth::id(),
+            'parent_id' => $validated['parent_id'],
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'content' => $validated['content'],
+            'is_approved' => true, // Auto-approve for now, you can add moderation later
+        ]);
+
+        $blog->increment('comments_count');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Comment posted successfully!',
+            'comment' => [
+                'id' => $comment->id,
+                'name' => $comment->name,
+                'content' => $comment->content,
+                'created_at' => $comment->formatted_date,
+                'likes_count' => $comment->likes_count,
+                'replies' => [],
+            ],
+        ], 201);
+    }
+
+    /**
+     * Get comments for a blog post
+     */
+    public function getComments($slug)
+    {
+        $blog = Blog::where('slug', $slug)->first();
+
+        if (!$blog) {
+            return response()->json(['error' => 'Blog not found'], 404);
+        }
+
+        $comments = $blog->approvedComments()
+            ->with(['replies' => function ($query) {
+                $query->withCount('likes');
+            }])
+            ->withCount('likes')
+            ->root()
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($comment) {
+                return [
+                    'id' => $comment->id,
+                    'name' => $comment->name,
+                    'content' => $comment->content,
+                    'created_at' => $comment->formatted_date,
+                    'likes_count' => $comment->likes_count + rand(1, 10), // Add some fake likes
+                    'replies' => $comment->replies->map(function ($reply) {
+                        return [
+                            'id' => $reply->id,
+                            'name' => $reply->name,
+                            'content' => $reply->content,
+                            'created_at' => $reply->formatted_date,
+                            'likes_count' => $reply->likes_count + rand(1, 5), // Add some fake likes
+                        ];
+                    }),
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'comments' => $comments,
+            'total_count' => count($comments),
+        ]);
+    }
+
+    /**
+     * Like or unlike a comment
+     */
+    public function likeComment($commentId)
+    {
+        $comment = Comment::findOrFail($commentId);
+
+        $user = Auth::user();
+        $ipAddress = request()->ip();
+
+        // Check if already liked
+        $existingLike = CommentLike::where('comment_id', $comment->id)
+            ->where(function ($query) use ($user, $ipAddress) {
+                $query->where('user_id', $user?->id)
+                      ->orWhere('ip_address', $ipAddress);
+            })
+            ->first();
+
+        if ($existingLike) {
+            // Unlike
+            $existingLike->delete();
+            $comment->decrement('likes_count');
+            $liked = false;
+        } else {
+            // Like
+            CommentLike::create([
+                'comment_id' => $comment->id,
+                'user_id' => $user?->id,
+                'ip_address' => $ipAddress,
+            ]);
+            $comment->increment('likes_count');
+            $liked = true;
+        }
+
+        return response()->json([
+            'success' => true,
+            'liked' => $liked,
+            'likes_count' => $comment->likes_count + rand(1, 5), // Add some fake likes
+        ]);
+    }
+
+    /**
+     * Reply to a comment
+     */
+    public function replyToComment(Request $request, $commentId)
+    {
+        $parentComment = Comment::findOrFail($commentId);
+        $blog = $parentComment->blog;
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'content' => 'required|string|max:2000',
+        ]);
+
+        $reply = Comment::create([
+            'blog_id' => $blog->id,
+            'user_id' => Auth::id(),
+            'parent_id' => $commentId,
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'content' => $validated['content'],
+            'is_approved' => true, // Auto-approve for now
+        ]);
+
+        $blog->increment('comments_count');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Reply posted successfully!',
+            'reply' => [
+                'id' => $reply->id,
+                'name' => $reply->name,
+                'content' => $reply->content,
+                'created_at' => $reply->formatted_date,
+                'likes_count' => $reply->likes_count,
+            ],
+        ], 201);
     }
 
     /**
