@@ -1,5 +1,21 @@
 <template>
   <div class="app-layout">
+    <!-- Preloader -->
+    <div v-if="isLoading" class="preloader">
+      <div class="preloader-content">
+        <div class="logo-animation">
+          <span class="logo-letter">G</span>
+          <span class="logo-letter">K</span>
+        </div>
+        <div class="loading-text">
+          <span class="loading-dot"></span>
+          <span class="loading-dot"></span>
+          <span class="loading-dot"></span>
+        </div>
+        <div class="loading-percentage">{{ loadingPercentage }}%</div>
+      </div>
+    </div>
+
     <!-- Navigation -->
     <nav
       ref="navbarRef"
@@ -114,6 +130,10 @@ const mobileMenuOpen = ref(false)
 const navbarRef = ref(null)
 const isScrolled = ref(false)
 
+// Preloader state
+const isLoading = ref(true)
+const loadingPercentage = ref(0)
+
 // Check if link is active
 const isLinkActive = (path) => {
   if (path === '/' && route.path === '/') {
@@ -216,6 +236,24 @@ const handleRouteChange = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
+// Preloader loading simulation
+const simulateLoading = () => {
+  let progress = 0
+  const interval = setInterval(() => {
+    progress += Math.random() * 15 + 5
+    if (progress >= 100) {
+      progress = 100
+      loadingPercentage.value = 100
+      setTimeout(() => {
+        isLoading.value = false
+      }, 500)
+      clearInterval(interval)
+    } else {
+      loadingPercentage.value = Math.floor(progress)
+    }
+  }, 100)
+}
+
 // Add event listeners
 onMounted(() => {
   // Initialize scroll state
@@ -233,6 +271,9 @@ onMounted(() => {
 
   // Add route change listener
   window.addEventListener('popstate', handleRouteChange)
+
+  // Start loading simulation
+  simulateLoading()
 })
 
 // Clean up event listeners
@@ -676,5 +717,204 @@ html {
 
 .mobile-nav::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 214, 10, 0.5);
+}
+
+/* Preloader Styles */
+.preloader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #000814 0%, #001233 50%, #000814 100%);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.preloader::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    radial-gradient(2px 2px at 20px 30px, white, transparent),
+    radial-gradient(2px 2px at 40px 70px, white, transparent),
+    radial-gradient(1px 1px at 50px 50px, white, transparent),
+    radial-gradient(1px 1px at 80px 10px, white, transparent),
+    radial-gradient(2px 2px at 130px 80px, white, transparent),
+    radial-gradient(1px 1px at 110px 60px, white, transparent),
+    radial-gradient(1px 1px at 150px 20px, white, transparent),
+    radial-gradient(2px 2px at 180px 90px, white, transparent),
+    radial-gradient(1px 1px at 200px 40px, white, transparent),
+    radial-gradient(1px 1px at 240px 100px, white, transparent),
+    radial-gradient(2px 2px at 280px 30px, white, transparent),
+    radial-gradient(1px 1px at 320px 70px, white, transparent);
+  background-repeat: repeat;
+  background-size: 350px 120px;
+  animation: starScroll 200s linear infinite;
+  opacity: 0.3;
+}
+
+.preloader-content {
+  text-align: center;
+  z-index: 1;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.logo-animation {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.logo-letter {
+  font-size: 4rem;
+  font-weight: bold;
+  color: transparent;
+  background: linear-gradient(135deg, #ffd60a, #00ffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: letterFloat 2s ease-in-out infinite;
+  text-shadow: 0 0 30px rgba(255, 214, 10, 0.5);
+}
+
+.logo-letter:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.logo-letter:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+@keyframes letterFloat {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-10px) scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+.loading-text {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.loading-dot {
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(45deg, #ffd60a, #00ffff);
+  border-radius: 50%;
+  animation: dotPulse 1.5s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(255, 214, 10, 0.5);
+}
+
+.loading-dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.loading-dot:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.loading-dot:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+@keyframes dotPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}
+
+.loading-percentage {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, #ffd60a, #00ffff, #ffd60a);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 2s linear infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Exit animation for preloader */
+.preloader.hide {
+  animation: fadeOut 0.5s ease-out forwards;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+/* Responsive preloader */
+@media (max-width: 768px) {
+  .logo-letter {
+    font-size: 3rem;
+  }
+
+  .loading-percentage {
+    font-size: 1rem;
+  }
+
+  .loading-dot {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-letter {
+    font-size: 2.5rem;
+  }
+
+  .loading-percentage {
+    font-size: 0.9rem;
+  }
+
+  .logo-animation {
+    margin-bottom: 1.5rem;
+  }
 }
 </style>
