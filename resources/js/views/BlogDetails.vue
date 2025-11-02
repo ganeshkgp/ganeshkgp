@@ -13,7 +13,7 @@
         <div class="text-6xl mb-4">🌌</div>
         <h2 class="text-3xl font-bold text-cyan-400 mb-4">Blog Not Found</h2>
         <p class="text-white/70 mb-6">{{ error }}</p>
-        <router-link to="/blogs" class="inline-block bg-gradient-to-r from-cyan-500 to-purple-500 text-black px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-300">
+        <router-link to="/blogs" class="inline-block bg-linear-to-r from-cyan-500 to-purple-500 text-black px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-300">
           ← Back to Blogs
         </router-link>
       </div>
@@ -21,7 +21,7 @@
 
     <article v-else class="min-h-screen">
       <!-- Hero Section -->
-      <section class="relative bg-gradient-to-br from-purple-900/20 via-black/50 to-cyan-900/20 backdrop-blur-lg overflow-hidden">
+      <section class="relative bg-linear-to-br from-purple-900/20 via-black/50 to-cyan-900/20 backdrop-blur-lg overflow-hidden">
         <div class="absolute inset-0 bg-black/40"></div>
 
         <!-- Animated Background Elements -->
@@ -36,14 +36,14 @@
           <div class="max-w-4xl mx-auto text-center">
             <!-- Category Badge -->
             <div class="mb-6 flex justify-center">
-              <span class="px-4 py-2 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 rounded-full backdrop-blur-sm text-cyan-400 text-sm font-semibold">
+              <span class="px-4 py-2 bg-linear-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 rounded-full backdrop-blur-sm text-cyan-400 text-sm font-semibold">
                 {{ formatCategory(blog.category) }}
               </span>
             </div>
 
             <!-- Title -->
             <h1 class="text-3xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight">
-              <span class="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent block">
+              <span class="bg-linear-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent block">
                 {{ blog.title }}
               </span>
             </h1>
@@ -92,7 +92,7 @@
               :alt="blog.title"
               class="w-full h-[400px] object-cover"
             />
-            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+            <div class="absolute inset-0 bg-linear-to-t from-black/50 to-transparent"></div>
           </div>
         </div>
       </section>
@@ -101,7 +101,7 @@
       <section v-if="blog.table_of_contents && blog.table_of_contents.length > 0" class="py-12">
         <div class="max-w-4xl mx-auto px-6">
           <div class="bg-black/50 border border-cyan-500/20 rounded-2xl p-6 backdrop-blur-lg">
-            <h3 class="text-xl font-semibold mb-4 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
+            <h3 class="text-xl font-semibold mb-4 bg-linear-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
               🗺️ Navigation
             </h3>
             <nav class="space-y-2">
@@ -135,7 +135,7 @@
                 <button
                   @click="toggleLike"
                   :disabled="likeLoading"
-                  class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500/20 to-red-500/20 border border-pink-500/30 rounded-lg hover:from-pink-500/30 hover:to-red-500/30 transition-all duration-300 disabled:opacity-50"
+                  class="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-pink-500/20 to-red-500/20 border border-pink-500/30 rounded-lg hover:from-pink-500/30 hover:to-red-500/30 transition-all duration-300 disabled:opacity-50"
                 >
                   <span :class="isLiked ? 'text-red-500' : 'text-white/70'">
                     {{ isLiked ? '❤️' : '🤍' }}
@@ -173,9 +173,9 @@
       <!-- Author Section -->
       <section class="py-12">
         <div class="max-w-4xl mx-auto px-6">
-          <div class="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-500/30 rounded-2xl p-8">
+          <div class="bg-linear-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-500/30 rounded-2xl p-8">
             <div class="flex items-center gap-6">
-              <div class="w-20 h-20 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full flex items-center justify-center text-black text-2xl font-bold">
+              <div class="w-20 h-20 bg-linear-to-r from-cyan-400 to-purple-500 rounded-full flex items-center justify-center text-black text-2xl font-bold">
                 {{ blog.author.name.charAt(0) }}
               </div>
               <div class="flex-1">
@@ -201,7 +201,7 @@
       <!-- Related Posts -->
       <section v-if="blog.related_posts && blog.related_posts.length > 0" class="py-12">
         <div class="max-w-6xl mx-auto px-6">
-          <h3 class="text-2xl font-semibold mb-8 text-center bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
+          <h3 class="text-2xl font-semibold mb-8 text-center bg-linear-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
             🚀 Related Cosmic Articles
           </h3>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -225,14 +225,14 @@
       <!-- Comments Section -->
       <section class="py-12">
         <div class="max-w-4xl mx-auto px-6">
-          <h3 class="text-2xl font-semibold mb-8 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
+          <h3 class="text-2xl font-semibold mb-8 bg-linear-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
             💬 Join the Discussion
           </h3>
 
           <!-- Comment Form -->
           <div v-if="isAuthenticated" class="bg-black/50 border border-cyan-500/20 rounded-2xl p-6 mb-8 backdrop-blur-lg">
             <div class="flex items-center gap-3 mb-4">
-              <div class="w-10 h-10 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full flex items-center justify-center text-black text-sm font-bold">
+              <div class="w-10 h-10 bg-linear-to-r from-cyan-400 to-purple-500 rounded-full flex items-center justify-center text-black text-sm font-bold">
                 {{ userInitials }}
               </div>
               <div>
@@ -254,7 +254,7 @@
               <button
                 type="submit"
                 :disabled="commentLoading || !commentForm.content.trim()"
-                class="px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="px-6 py-3 bg-linear-to-r from-cyan-500 to-purple-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {{ commentLoading ? 'Posting...' : '🚀 Launch Comment' }}
               </button>
@@ -264,7 +264,7 @@
           <!-- Login to Comment -->
           <div v-else class="bg-black/50 border border-cyan-500/20 rounded-2xl p-8 mb-8 backdrop-blur-lg text-center">
             <div class="mb-6">
-              <div class="w-16 h-16 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div class="w-16 h-16 bg-linear-to-r from-cyan-500/20 to-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span class="text-2xl">🔒</span>
               </div>
               <h4 class="text-xl font-semibold text-cyan-400 mb-2">Join the Discussion</h4>
@@ -273,7 +273,7 @@
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
               <router-link
                 :to="{ path: '/login', query: { redirect: $route.fullPath } }"
-                class="px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-300"
+                class="px-6 py-3 bg-linear-to-r from-cyan-500 to-purple-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-300"
               >
                 Sign In
               </router-link>
@@ -305,7 +305,7 @@
             >
               <div class="flex items-start justify-between mb-4">
                 <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full flex items-center justify-center text-black font-bold">
+                  <div class="w-10 h-10 bg-linear-to-r from-cyan-400 to-purple-500 rounded-full flex items-center justify-center text-black font-bold">
                     {{ comment.name.charAt(0).toUpperCase() }}
                   </div>
                   <div>
@@ -334,7 +334,7 @@
               <!-- Reply Form -->
               <div v-if="replyFormVisible === comment.id" class="mt-4 space-y-3">
                 <div class="flex items-center gap-2 mb-2">
-                  <div class="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-black text-sm font-bold">
+                  <div class="w-8 h-8 bg-linear-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-black text-sm font-bold">
                     {{ authStore.userInitials }}
                   </div>
                   <span class="text-cyan-400 text-sm">Replying as {{ authStore.displayName }}</span>
@@ -350,7 +350,7 @@
                   <button
                     @click="submitReply(comment.id)"
                     :disabled="replyLoading"
-                    class="px-4 py-2 bg-gradient-to-r from-cyan-500 to-purple-500 text-black rounded-lg font-semibold text-sm hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 disabled:opacity-50"
+                    class="px-4 py-2 bg-linear-to-r from-cyan-500 to-purple-500 text-black rounded-lg font-semibold text-sm hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 disabled:opacity-50"
                   >
                     {{ replyLoading ? 'Posting...' : 'Reply' }}
                   </button>
@@ -372,7 +372,7 @@
                 >
                   <div class="flex items-center justify-between mb-2">
                     <div class="flex items-center gap-2">
-                      <div class="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-black text-sm font-bold">
+                      <div class="w-8 h-8 bg-linear-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-black text-sm font-bold">
                         {{ reply.name.charAt(0).toUpperCase() }}
                       </div>
                       <div>
@@ -392,7 +392,7 @@
             <button
               @click="loadMoreComments"
               :disabled="loadMoreLoading"
-              class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 rounded-lg hover:from-cyan-500/30 hover:to-purple-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 rounded-lg hover:from-cyan-500/30 hover:to-purple-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span v-if="loadMoreLoading" class="w-4 h-4 border-2 border-cyan-400/20 border-t-cyan-400 rounded-full animate-spin"></span>
               <span v-else>Load More Comments</span>
@@ -414,7 +414,7 @@
       <!-- Back to Blogs -->
       <section class="py-12">
         <div class="max-w-4xl mx-auto px-6 text-center">
-          <router-link to="/blogs" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 rounded-lg hover:from-cyan-500/30 hover:to-purple-500/30 transition-all duration-300">
+          <router-link to="/blogs" class="inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 rounded-lg hover:from-cyan-500/30 hover:to-purple-500/30 transition-all duration-300">
             <span>←</span>
             <span>Back to Blog Universe</span>
           </router-link>
