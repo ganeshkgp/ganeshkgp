@@ -407,7 +407,7 @@ const createPlanets = () => {
 
     // Position planet in orbital ring around sun
     const orbitRadius = 8 + (index * 4) // Increasing orbital radius
-    const orbitAngle = (index / planetsData.value.length) * Math.PI * 2 // Spread evenly around circle
+    const orbitAngle = Math.random() * Math.PI * 2 // Random initial angle instead of even spacing
     const height = (Math.random() - 0.5) * 1 // Slight vertical variation
 
     planetGroup.position.set(

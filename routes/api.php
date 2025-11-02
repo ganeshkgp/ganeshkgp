@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\MediaController;
 use App\Http\Controllers\Api\HomeController;
 use App\Http\Controllers\Api\ScraperController;
+use App\Http\Controllers\Api\AuthController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -20,6 +21,20 @@ Route::get('/mail-test', function () {
             ->subject('Laravel SMTP test');
     });
     return 'Mail queued/sent (check recipient)';
+});
+
+// Authentication Routes
+Route::prefix('auth')->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/user', [AuthController::class, 'user']);
+        Route::post('/logout', [AuthController::class, 'logout']);
+        Route::post('/logout-all', [AuthController::class, 'logoutAll']);
+        Route::post('/refresh', [AuthController::class, 'refresh']);
+        Route::post('/change-password', [AuthController::class, 'changePassword']);
+    });
 });
 
 // Public API Routes
@@ -44,10 +59,10 @@ Route::prefix('v1')->group(function () {
 
     // Blog Comments and Likes
     Route::post('/blogs/{slug}/like', [HomeController::class, 'likeBlog']);
-    Route::post('/blogs/{slug}/comments', [HomeController::class, 'storeComment']);
+    Route::post('/blogs/{slug}/comments', [HomeController::class, 'storeComment'])->middleware('auth:sanctum');
     Route::get('/blogs/{slug}/comments', [HomeController::class, 'getComments']);
-    Route::post('/comments/{comment}/like', [HomeController::class, 'likeComment']);
-    Route::post('/comments/{comment}/reply', [HomeController::class, 'replyToComment']);
+    Route::post('/comments/{comment}/like', [HomeController::class, 'likeComment'])->middleware('auth:sanctum');
+    Route::post('/comments/{comment}/reply', [HomeController::class, 'replyToComment'])->middleware('auth:sanctum');
 
     // Contact
     Route::post('/contact', [ContactController::class, 'store']);

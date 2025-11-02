@@ -41,6 +41,22 @@ const routes = [
       title: 'Contact Me | 3D Portfolio'
     }
   },
+  {
+    path: '/login',
+    name: 'Login',
+    component: () => import('../views/Login.vue'),
+    meta: {
+      title: 'Sign In | Space Portfolio'
+    }
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: () => import('../views/Register.vue'),
+    meta: {
+      title: 'Create Account | Space Portfolio'
+    }
+  },
 
 ]
 

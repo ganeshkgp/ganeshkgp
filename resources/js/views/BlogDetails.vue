@@ -230,32 +230,19 @@
           </h3>
 
           <!-- Comment Form -->
-          <div class="bg-black/50 border border-cyan-500/20 rounded-2xl p-6 mb-8 backdrop-blur-lg">
-            <form @submit.prevent="submitComment" class="space-y-4">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-white/70 text-sm mb-2">Name</label>
-                  <input
-                    v-model="commentForm.name"
-                    type="text"
-                    required
-                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:border-cyan-500/30 focus:bg-white/10 focus:outline-none transition-all duration-300"
-                    placeholder="Your name"
-                  />
-                </div>
-                <div>
-                  <label class="block text-white/70 text-sm mb-2">Email</label>
-                  <input
-                    v-model="commentForm.email"
-                    type="email"
-                    required
-                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:border-cyan-500/30 focus:bg-white/10 focus:outline-none transition-all duration-300"
-                    placeholder="your@email.com"
-                  />
-                </div>
+          <div v-if="isAuthenticated" class="bg-black/50 border border-cyan-500/20 rounded-2xl p-6 mb-8 backdrop-blur-lg">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full flex items-center justify-center text-black text-sm font-bold">
+                {{ userInitials }}
               </div>
               <div>
-                <label class="block text-white/70 text-sm mb-2">Comment</label>
+                <h4 class="text-cyan-400 font-medium">{{ currentUser.name }}</h4>
+                <p class="text-white/50 text-sm">Share your thoughts on this cosmic article</p>
+              </div>
+            </div>
+            <form @submit.prevent="submitComment" class="space-y-4">
+              <div>
+                <label class="block text-white/70 text-sm mb-2">Your Comment</label>
                 <textarea
                   v-model="commentForm.content"
                   required
@@ -266,21 +253,46 @@
               </div>
               <button
                 type="submit"
-                :disabled="commentLoading"
-                class="px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 disabled:opacity-50"
+                :disabled="commentLoading || !commentForm.content.trim()"
+                class="px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {{ commentLoading ? 'Posting...' : '🚀 Launch Comment' }}
               </button>
             </form>
           </div>
 
+          <!-- Login to Comment -->
+          <div v-else class="bg-black/50 border border-cyan-500/20 rounded-2xl p-8 mb-8 backdrop-blur-lg text-center">
+            <div class="mb-6">
+              <div class="w-16 h-16 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="text-2xl">🔒</span>
+              </div>
+              <h4 class="text-xl font-semibold text-cyan-400 mb-2">Join the Discussion</h4>
+              <p class="text-white/70">Sign in to share your thoughts and engage with the community</p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+              <router-link
+                :to="{ path: '/login', query: { redirect: $route.fullPath } }"
+                class="px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-300"
+              >
+                Sign In
+              </router-link>
+              <router-link
+                :to="{ path: '/register', query: { redirect: $route.fullPath } }"
+                class="px-6 py-3 bg-white/10 border border-white/20 rounded-lg text-white/70 hover:bg-white/20 transition-all duration-300"
+              >
+                Create Account
+              </router-link>
+            </div>
+          </div>
+
           <!-- Comments List -->
-          <div v-if="commentsLoading" class="text-center py-8">
+          <div v-if="commentsLoading && pagination.current_page === 1" class="text-center py-8">
             <div class="w-12 h-12 border-4 border-cyan-500/20 rounded-full animate-spin border-t-cyan-500 mx-auto"></div>
             <p class="text-white/70 mt-4">Loading comments...</p>
           </div>
 
-          <div v-else-if="comments.length === 0" class="text-center py-8">
+          <div v-else-if="comments.length === 0 && !commentsLoading" class="text-center py-8">
             <div class="text-4xl mb-4">💭</div>
             <p class="text-white/70">No comments yet. Be the first to share your thoughts!</p>
           </div>
@@ -321,21 +333,11 @@
 
               <!-- Reply Form -->
               <div v-if="replyFormVisible === comment.id" class="mt-4 space-y-3">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <input
-                    v-model="replyForm.name"
-                    type="text"
-                    required
-                    class="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:border-cyan-500/30 focus:bg-white/10 focus:outline-none text-sm"
-                    placeholder="Your name"
-                  />
-                  <input
-                    v-model="replyForm.email"
-                    type="email"
-                    required
-                    class="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:border-cyan-500/30 focus:bg-white/10 focus:outline-none text-sm"
-                    placeholder="your@email.com"
-                  />
+                <div class="flex items-center gap-2 mb-2">
+                  <div class="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-black text-sm font-bold">
+                    {{ authStore.userInitials }}
+                  </div>
+                  <span class="text-cyan-400 text-sm">Replying as {{ authStore.displayName }}</span>
                 </div>
                 <textarea
                   v-model="replyForm.content"
@@ -384,6 +386,28 @@
               </div>
             </div>
           </div>
+
+          <!-- Load More Button -->
+          <div v-if="pagination.has_more" class="text-center mt-8">
+            <button
+              @click="loadMoreComments"
+              :disabled="loadMoreLoading"
+              class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 rounded-lg hover:from-cyan-500/30 hover:to-purple-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span v-if="loadMoreLoading" class="w-4 h-4 border-2 border-cyan-400/20 border-t-cyan-400 rounded-full animate-spin"></span>
+              <span v-else>Load More Comments</span>
+            </button>
+          </div>
+
+          <!-- Comments Info -->
+          <div v-if="comments.length > 0" class="text-center mt-6 text-white/50 text-sm">
+            <span v-if="pagination.total > pagination.per_page">
+              Showing {{ pagination.from }}-{{ pagination.to }} of {{ pagination.total }} comments
+            </span>
+            <span v-else>
+              {{ pagination.total }} {{ pagination.total === 1 ? 'comment' : 'comments' }}
+            </span>
+          </div>
         </div>
       </section>
 
@@ -401,12 +425,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AppLayout from '../components/AppLayout.vue'
+import { useAuthStore } from '../stores/auth'
 
 const route = useRoute()
 const router = useRouter()
+const authStore = useAuthStore()
 
 // Store original overflow settings
 let originalAppStyles = {}
@@ -421,23 +447,37 @@ const comments = ref([])
 const commentsLoading = ref(false)
 const isLiked = ref(false)
 const likeLoading = ref(false)
-
-// Comment form
-const commentForm = ref({
-  name: '',
-  email: '',
-  content: ''
-})
 const commentLoading = ref(false)
+
+// Pagination data
+const pagination = ref({
+  current_page: 1,
+  last_page: 1,
+  per_page: 5,
+  total: 0,
+  has_more: false,
+  from: null,
+  to: null
+})
+const loadMoreLoading = ref(false)
 
 // Reply form
 const replyFormVisible = ref(null)
 const replyForm = ref({
-  name: '',
-  email: '',
   content: ''
 })
 const replyLoading = ref(false)
+
+// Computed properties for authentication
+const isAuthenticated = computed(() => authStore.isAuthenticated)
+const currentUser = computed(() => authStore.user)
+
+// Pre-fill comment form with user data if authenticated
+const commentForm = ref({
+  name: currentUser.value?.name || '',
+  email: currentUser.value?.email || '',
+  content: ''
+})
 
 // Fetch blog details
 const fetchBlogDetails = async () => {
@@ -463,24 +503,50 @@ const fetchBlogDetails = async () => {
 }
 
 // Fetch comments
-const fetchComments = async () => {
+const fetchComments = async (page = 1, append = false) => {
   if (!blog.value) return
 
   try {
-    commentsLoading.value = true
-    const response = await fetch(`/api/v1/home/blogs/${blog.value.slug}/comments`)
+    if (!append) {
+      commentsLoading.value = true
+    } else {
+      loadMoreLoading.value = true
+    }
+
+    const response = await fetch(`/api/v1/blogs/${blog.value.slug}/comments?page=${page}&per_page=${pagination.value.per_page}`)
 
     if (response.ok) {
       const data = await response.json()
-      comments.value = data.comments.map(comment => ({
-        ...comment,
-        isLiked: false
-      }))
+
+      if (append) {
+        // Append new comments to existing ones
+        comments.value = [...comments.value, ...data.comments.map(comment => ({
+          ...comment,
+          isLiked: false
+        }))]
+      } else {
+        // Replace all comments
+        comments.value = data.comments.map(comment => ({
+          ...comment,
+          isLiked: false
+        }))
+      }
+
+      // Update pagination data
+      pagination.value = data.pagination
     }
   } catch (err) {
     console.error('Error fetching comments:', err)
   } finally {
     commentsLoading.value = false
+    loadMoreLoading.value = false
+  }
+}
+
+// Load more comments
+const loadMoreComments = async () => {
+  if (pagination.value.has_more && !loadMoreLoading.value) {
+    await fetchComments(pagination.value.current_page + 1, true)
   }
 }
 
@@ -514,36 +580,44 @@ const toggleLike = async () => {
 const submitComment = async () => {
   if (!blog.value || commentLoading.value) return
 
+  // Check if user is authenticated
+  if (!isAuthenticated.value) {
+    // Redirect to login with return URL
+    router.push({
+      path: '/login',
+      query: { redirect: route.fullPath }
+    })
+    return
+  }
+
   try {
     commentLoading.value = true
     const response = await fetch(`/api/v1/blogs/${blog.value.slug}/comments`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
-      },
-      body: JSON.stringify(commentForm.value)
+      headers: authStore.getAuthHeaders(),
+      body: JSON.stringify({
+        content: commentForm.value.content
+      })
     })
 
     if (response.ok) {
-      const data = await response.json()
-      comments.value.unshift({
-        ...data.comment,
-        isLiked: false
-      })
+      // Reset form content
+      commentForm.value.content = ''
 
-      // Reset form
-      commentForm.value = {
-        name: '',
-        email: '',
-        content: ''
+      // Refresh comments to get the latest data and ensure persistence
+      await fetchComments(1, false) // Reset to first page to show new comment
+
+      // Update comment count if blog stats exist
+      if (blog.value.stats) {
+        blog.value.stats.comments++
       }
-
-      // Update comment count
-      blog.value.stats.comments++
+    } else {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Failed to post comment')
     }
   } catch (err) {
     console.error('Error submitting comment:', err)
+    // You could show a toast notification here
   } finally {
     commentLoading.value = false
   }
@@ -553,8 +627,6 @@ const submitComment = async () => {
 const toggleReplyForm = (commentId) => {
   replyFormVisible.value = replyFormVisible.value === commentId ? null : commentId
   replyForm.value = {
-    name: '',
-    email: '',
     content: ''
   }
 }
@@ -563,34 +635,39 @@ const toggleReplyForm = (commentId) => {
 const submitReply = async (commentId) => {
   if (!blog.value || replyLoading.value) return
 
+  // Check if user is authenticated
+  if (!isAuthenticated.value) {
+    router.push({
+      path: '/login',
+      query: { redirect: route.fullPath }
+    })
+    return
+  }
+
   try {
     replyLoading.value = true
     const response = await fetch(`/api/v1/comments/${commentId}/reply`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
-      },
-      body: JSON.stringify(replyForm.value)
+      headers: authStore.getAuthHeaders(),
+      body: JSON.stringify({
+        content: replyForm.value.content
+      })
     })
 
     if (response.ok) {
-      const data = await response.json()
-
-      // Find the parent comment and add the reply
-      const parentComment = comments.value.find(c => c.id === commentId)
-      if (parentComment) {
-        if (!parentComment.replies) {
-          parentComment.replies = []
-        }
-        parentComment.replies.push(data.reply)
-      }
-
       // Reset form
       toggleReplyForm(null)
 
-      // Update comment count
-      blog.value.stats.comments++
+      // Refresh comments to get the latest data and ensure persistence
+      await fetchComments(pagination.value.current_page, false)
+
+      // Update comment count if blog stats exist
+      if (blog.value.stats) {
+        blog.value.stats.comments++
+      }
+    } else {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Failed to post reply')
     }
   } catch (err) {
     console.error('Error submitting reply:', err)
@@ -673,6 +750,92 @@ const formatNumber = (num) => {
   return num.toString()
 }
 
+// Enhance code blocks with language detection and copy functionality
+const enhanceCodeBlocks = () => {
+  const codeBlocks = document.querySelectorAll('.blog-content pre')
+
+  codeBlocks.forEach((pre) => {
+    const code = pre.querySelector('code')
+    if (!code) return
+
+    // Detect language from class or content
+    const language = detectLanguage(code)
+    if (language) {
+      pre.setAttribute('data-language', language)
+    }
+
+    // Add copy button
+    const copyButton = document.createElement('button')
+    copyButton.innerHTML = '📋 Copy'
+    copyButton.className = 'code-copy-btn'
+    copyButton.style.cssText = `
+      position: absolute;
+      top: 0.75rem;
+      left: 0.75rem;
+      background: rgba(0, 255, 255, 0.2);
+      color: #00ffff;
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 10;
+    `
+
+    copyButton.addEventListener('click', async () => {
+      try {
+        const text = code.textContent || code.innerText
+        await navigator.clipboard.writeText(text)
+
+        copyButton.innerHTML = '✅ Copied!'
+        copyButton.style.background = 'rgba(0, 255, 0, 0.3)'
+        copyButton.style.color = '#00ff00'
+
+        setTimeout(() => {
+          copyButton.innerHTML = '📋 Copy'
+          copyButton.style.background = 'rgba(0, 255, 255, 0.2)'
+          copyButton.style.color = '#00ffff'
+        }, 2000)
+      } catch (err) {
+        console.error('Failed to copy code:', err)
+      }
+    })
+
+    pre.appendChild(copyButton)
+  })
+}
+
+// Detect programming language from code content
+const detectLanguage = (codeElement) => {
+  const code = codeElement.textContent || codeElement.innerText
+  const className = codeElement.className || ''
+
+  // Check for explicit language class
+  if (className.includes('language-')) {
+    const match = className.match(/language-(\w+)/)
+    if (match) return match[1].toUpperCase()
+  }
+
+  // Detect from patterns
+  if (code.includes('def ') && code.includes(':')) return 'PYTHON'
+  if (code.includes('function ') && code.includes('{')) return 'JAVASCRIPT'
+  if (code.includes('public class ') || code.includes('private ')) return 'JAVA'
+  if (code.includes('<?php') || code.includes('$')) return 'PHP'
+  if (code.includes('#include') || code.includes('int main')) return 'C++'
+  if (code.includes('using System') || code.includes('namespace ')) return 'C#'
+  if (code.includes('import React') || code.includes('useState')) return 'REACT'
+  if (code.includes('import ') && code.includes('from ')) return 'JAVASCRIPT'
+  if (code.includes('<html') || code.includes('<div>')) return 'HTML'
+  if (code.includes('SELECT ') || code.includes('FROM ')) return 'SQL'
+  if (code.includes('git ')) return 'GIT'
+  if (code.includes('npm ') || code.includes('yarn ')) return 'NPM'
+
+  return 'CODE'
+}
+
+
 onMounted(async () => {
   console.log('BlogDetails page mounted - enabling scrolling')
 
@@ -738,6 +901,9 @@ onMounted(async () => {
 
   // Fetch blog details
   await fetchBlogDetails()
+
+  // Enhance code blocks after content is loaded
+  enhanceCodeBlocks()
 })
 
 onUnmounted(() => {
@@ -817,6 +983,7 @@ onUnmounted(() => {
 /* Blog content styling */
 .blog-content {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.7;
 }
 
 .blog-content h1,
@@ -826,21 +993,33 @@ onUnmounted(() => {
 .blog-content h5,
 .blog-content h6 {
   color: #00ffff;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1.2rem;
   font-weight: 700;
   text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  scroll-margin-top: 100px; /* For anchor links */
 }
 
-.blog-content h1 { font-size: 2.5rem; }
-.blog-content h2 { font-size: 2rem; }
+.blog-content h1 {
+  font-size: 2.5rem;
+  border-bottom: 2px solid rgba(0, 255, 255, 0.3);
+  padding-bottom: 0.5rem;
+}
+.blog-content h2 {
+  font-size: 2rem;
+  border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+  padding-bottom: 0.3rem;
+}
 .blog-content h3 { font-size: 1.5rem; }
 .blog-content h4 { font-size: 1.25rem; }
+.blog-content h5 { font-size: 1.1rem; }
+.blog-content h6 { font-size: 1rem; }
 
 .blog-content p {
   margin-bottom: 1.5rem;
   line-height: 1.8;
   color: rgba(255, 255, 255, 0.9);
+  text-align: justify;
 }
 
 .blog-content ul,
@@ -850,79 +1029,255 @@ onUnmounted(() => {
 }
 
 .blog-content li {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.6rem;
   color: rgba(255, 255, 255, 0.9);
+  line-height: 1.6;
 }
 
 .blog-content blockquote {
   border-left: 4px solid #00ffff;
-  padding-left: 1.5rem;
   margin: 1.5rem 0;
   font-style: italic;
   color: rgba(255, 255, 255, 0.8);
-  background: rgba(0, 255, 255, 0.1);
-  padding: 1rem 1.5rem;
-  border-radius: 0.5rem;
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.05));
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 255, 255, 0.1);
 }
 
-.blog-content code {
-  background: rgba(255, 0, 255, 0.2);
+.blog-content blockquote::before {
+  content: '"';
+  position: absolute;
+  top: -10px;
+  left: 20px;
+  font-size: 4rem;
+  color: rgba(0, 255, 255, 0.3);
+  font-family: Georgia, serif;
+}
+
+/* Inline code */
+.blog-content code:not(pre code) {
+  background: linear-gradient(135deg, rgba(255, 0, 255, 0.2), rgba(255, 0, 255, 0.1));
   color: #ff00ff;
-  padding: 0.2rem 0.4rem;
-  border-radius: 0.25rem;
-  font-size: 0.9rem;
-}
-
-.blog-content pre {
-  background: rgba(0, 8, 20, 0.8);
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-family: 'Fira Code', 'Courier New', monospace;
   border: 1px solid rgba(255, 0, 255, 0.3);
-  border-radius: 0.5rem;
-  padding: 1rem;
-  overflow-x: auto;
-  margin: 1.5rem 0;
+  text-shadow: 0 0 5px rgba(255, 0, 255, 0.5);
+  font-weight: 500;
 }
 
+/* Enhanced code blocks */
+.blog-content pre {
+  background: rgba(0, 8, 20, 0.95);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 0.75rem;
+  padding: 0;
+  margin: 2rem 0;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.blog-content pre::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #00ffff, #ff00ff, #00ffff);
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Code block header */
+.blog-content pre::after {
+  content: attr(data-language);
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: rgba(0, 255, 255, 0.2);
+  color: #00ffff;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  z-index: 5;
+}
+
+/* Scrollable code container */
 .blog-content pre code {
   background: none;
-  color: inherit;
-  padding: 0;
+  color: #ffffff;
+  padding: 1.5rem;
+  font-family: 'Fira Code', 'Courier New', monospace;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  display: block;
+  white-space: pre;
+  overflow-x: auto;
+  max-height: 500px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 255, 255, 0.5) rgba(0, 8, 20, 0.8);
+}
+
+/* Custom scrollbar for code blocks */
+.blog-content pre code::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.blog-content pre code::-webkit-scrollbar-track {
+  background: rgba(0, 8, 20, 0.8);
+  border-radius: 6px;
+}
+
+.blog-content pre code::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, rgba(0, 255, 255, 0.6), rgba(255, 0, 255, 0.6));
+  border-radius: 6px;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+}
+
+.blog-content pre code::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(45deg, rgba(0, 255, 255, 0.8), rgba(255, 0, 255, 0.8));
+}
+
+.blog-content pre code::-webkit-scrollbar-corner {
+  background: rgba(0, 8, 20, 0.8);
+}
+
+/* Syntax highlighting colors */
+.blog-content pre .token.comment,
+.blog-content pre .token.prolog,
+.blog-content pre .token.doctype,
+.blog-content pre .token.cdata {
+  color: #6a9955;
+  font-style: italic;
+}
+
+.blog-content pre .token.punctuation {
+  color: #d4d4d4;
+}
+
+.blog-content pre .token.property,
+.blog-content pre .token.tag,
+.blog-content pre .token.boolean,
+.blog-content pre .token.number,
+.blog-content pre .token.constant,
+.blog-content pre .token.symbol,
+.blog-content pre .token.deleted {
+  color: #b5cea8;
+}
+
+.blog-content pre .token.selector,
+.blog-content pre .token.attr-name,
+.blog-content pre .token.string,
+.blog-content pre .token.char,
+.blog-content pre .token.builtin,
+.blog-content pre .token.inserted {
+  color: #ce9178;
+}
+
+.blog-content pre .token.operator,
+.blog-content pre .token.entity,
+.blog-content pre .token.url,
+.blog-content pre .language-css .token.string,
+.blog-content pre .style .token.string {
+  color: #d4d4d4;
+}
+
+.blog-content pre .token.atrule,
+.blog-content pre .token.attr-value,
+.blog-content pre .token.keyword {
+  color: #c586c0;
+}
+
+.blog-content pre .token.function,
+.blog-content pre .token.class-name {
+  color: #dcdcaa;
+}
+
+.blog-content pre .token.regex,
+.blog-content pre .token.important,
+.blog-content pre .token.variable {
+  color: #d16969;
 }
 
 .blog-content a {
   color: #00ffff;
   text-decoration: none;
   border-bottom: 1px solid transparent;
-  transition: border-color 0.3s ease;
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-block;
 }
 
 .blog-content a:hover {
   border-bottom-color: #00ffff;
+  transform: translateY(-1px);
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
 }
 
 .blog-content img {
   max-width: 100%;
   height: auto;
-  border-radius: 0.5rem;
-  margin: 1.5rem 0;
+  border-radius: 0.75rem;
+  margin: 2rem 0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.blog-content img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
 }
 
 .blog-content table {
   width: 100%;
   border-collapse: collapse;
-  margin: 1.5rem 0;
+  margin: 2rem 0;
+  background: rgba(0, 8, 20, 0.6);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
 }
 
 .blog-content th,
 .blog-content td {
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem;
   text-align: left;
+  transition: background-color 0.3s ease;
 }
 
 .blog-content th {
-  background: rgba(0, 255, 255, 0.1);
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.1));
   color: #00ffff;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.875rem;
+}
+
+.blog-content tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.blog-content tr:hover td {
+  background: rgba(0, 255, 255, 0.05);
 }
 
 /* Line clamp utility */

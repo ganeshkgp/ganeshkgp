@@ -130,7 +130,7 @@ class HomeController extends Controller
                 'is_featured' => $blog->is_featured,
                 'published_at' => $blog->published_at->format('M j, Y'),
                 'author' => [
-                    'name' => 'Ganesh Khanderao',
+                    'name' => 'Ganesh rao',
                     'avatar' => '/images/avatar.jpg',
                     'bio' => 'Full Stack Developer & Tech Enthusiast'
                 ],
@@ -740,18 +740,17 @@ const BlogComponent = () => {\n  const [posts, setPosts] = useState([]);\n  \n  
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
             'content' => 'required|string|max:2000',
             'parent_id' => 'nullable|exists:comments,id',
         ]);
+        $user = Auth::user();
 
         $comment = Comment::create([
             'blog_id' => $blog->id,
-            'user_id' => Auth::id(),
-            'parent_id' => $validated['parent_id'],
-            'name' => $validated['name'],
-            'email' => $validated['email'],
+            'user_id' => $user->id,
+            'parent_id' => $validated['parent_id'] ?? null,
+            'name' => $user->name,
+            'email' => $user->email,
             'content' => $validated['content'],
             'is_approved' => true, // Auto-approve for now, you can add moderation later
         ]);
@@ -783,37 +782,50 @@ const BlogComponent = () => {\n  const [posts, setPosts] = useState([]);\n  \n  
             return response()->json(['error' => 'Blog not found'], 404);
         }
 
-        $comments = $blog->approvedComments()
+        $perPage = request()->get('per_page', 5);
+        $page = request()->get('page', 1);
+
+        $commentsQuery = $blog->approvedComments()
             ->with(['replies' => function ($query) {
                 $query->withCount('likes');
             }])
             ->withCount('likes')
             ->root()
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($comment) {
-                return [
-                    'id' => $comment->id,
-                    'name' => $comment->name,
-                    'content' => $comment->content,
-                    'created_at' => $comment->formatted_date,
-                    'likes_count' => $comment->likes_count + rand(1, 10), // Add some fake likes
-                    'replies' => $comment->replies->map(function ($reply) {
-                        return [
-                            'id' => $reply->id,
-                            'name' => $reply->name,
-                            'content' => $reply->content,
-                            'created_at' => $reply->formatted_date,
-                            'likes_count' => $reply->likes_count + rand(1, 5), // Add some fake likes
-                        ];
-                    }),
-                ];
-            });
+            ->orderBy('created_at', 'desc');
+
+        $comments = $commentsQuery->paginate($perPage, ['*'], 'page', $page);
+
+        $commentData = $comments->getCollection()->map(function ($comment) {
+            return [
+                'id' => $comment->id,
+                'name' => $comment->name,
+                'content' => $comment->content,
+                'created_at' => $comment->formatted_date,
+                'likes_count' => $comment->likes_count + rand(1, 10), // Add some fake likes
+                'replies' => $comment->replies->map(function ($reply) {
+                    return [
+                        'id' => $reply->id,
+                        'name' => $reply->name,
+                        'content' => $reply->content,
+                        'created_at' => $reply->formatted_date,
+                        'likes_count' => $reply->likes_count + rand(1, 5), // Add some fake likes
+                    ];
+                }),
+            ];
+        });
 
         return response()->json([
             'success' => true,
-            'comments' => $comments,
-            'total_count' => count($comments),
+            'comments' => $commentData,
+            'pagination' => [
+                'current_page' => $comments->currentPage(),
+                'last_page' => $comments->lastPage(),
+                'per_page' => $comments->perPage(),
+                'total' => $comments->total(),
+                'has_more' => $comments->hasMorePages(),
+                'from' => $comments->firstItem(),
+                'to' => $comments->lastItem(),
+            ]
         ]);
     }
 
@@ -867,17 +879,17 @@ const BlogComponent = () => {\n  const [posts, setPosts] = useState([]);\n  \n  
         $blog = $parentComment->blog;
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
             'content' => 'required|string|max:2000',
         ]);
 
+        $user = Auth::user();
+
         $reply = Comment::create([
             'blog_id' => $blog->id,
-            'user_id' => Auth::id(),
+            'user_id' => $user->id,
             'parent_id' => $commentId,
-            'name' => $validated['name'],
-            'email' => $validated['email'],
+            'name' => $user->name,
+            'email' => $user->email,
             'content' => $validated['content'],
             'is_approved' => true, // Auto-approve for now
         ]);

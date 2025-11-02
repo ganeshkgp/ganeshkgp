@@ -27,3 +27,8 @@ Route::get('/contact', function () {
 Route::get('/about', function () {
     return view('welcome');
 });
+
+// Vue.js SPA catch-all route for Vue Router history mode
+Route::get('/{any?}', function () {
+    return view('welcome');
+})->where('any', '^(?!api|admin|storage|public).*');
