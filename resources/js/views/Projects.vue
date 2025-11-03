@@ -74,7 +74,7 @@
 
         <!-- Mobile Controls (outside game-ui) -->
         <div class="mobile-controls mobile-only">
-          <!-- Left Side - Movement Controls -->
+          <!-- Left Side - Movement Controls (DPAD style) -->
           <div class="movement-controls left-controls">
             <button
               class="mobile-btn move-btn left-btn"
@@ -1246,25 +1246,47 @@ onUnmounted(() => {
 
 .movement-controls.left-controls {
   order: 1;
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+  pointer-events: auto;
 }
 
 .fire-controls.right-controls {
   order: 2;
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  pointer-events: auto;
 }
 
 .movement-controls {
   display: flex;
-  gap: 1rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
   pointer-events: auto;
 }
 
 .left-controls {
   display: flex;
-  gap: 1rem;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 0.3rem;
+  border-radius: 25px;
+  border: 1px solid rgba(0, 150, 255, 0.3);
+  backdrop-filter: blur(5px);
 }
 
 .right-controls {
   pointer-events: auto;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 0.3rem;
+  border-radius: 35px;
+  border: 1px solid rgba(255, 100, 100, 0.3);
+  backdrop-filter: blur(5px);
 }
 
 .mobile-btn {
@@ -1288,26 +1310,39 @@ onUnmounted(() => {
 }
 
 .move-btn {
-  width: 60px;
-  height: 60px;
+  width: 45px;
+  height: 45px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: bold;
+  background: rgba(0, 100, 200, 0.7);
+  border-color: rgba(0, 150, 255, 0.5);
+  border-radius: 50%;
+  box-shadow: 0 4px 15px rgba(0, 150, 255, 0.3);
+}
+
+.move-btn:active {
+  background: rgba(0, 150, 255, 0.8);
+  border-color: rgba(0, 200, 255, 0.8);
+  transform: scale(0.9);
 }
 
 .fire-btn {
-  width: 100px;
-  height: 50px;
+  width: 55px;
+  height: 55px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  font-size: 1rem;
+  gap: 0.1rem;
+  font-size: 0.9rem;
   font-weight: bold;
   background: rgba(255, 0, 0, 0.7);
   border-color: rgba(255, 100, 100, 0.5);
+  border-radius: 50%;
+  box-shadow: 0 4px 20px rgba(255, 0, 0, 0.4);
 }
 
 .fire-btn:active {
@@ -1361,8 +1396,8 @@ onUnmounted(() => {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 90%;
-  max-width: 400px;
+  width: 85%;
+  max-width: 320px;
   animation: screenAppear 0.5s ease-out;
 }
 
@@ -1384,20 +1419,20 @@ onUnmounted(() => {
     rgba(26, 0, 51, 0.95) 50%,
     rgba(0, 8, 20, 0.95) 100%);
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 20px;
-  padding: 3rem;
+  border-radius: 15px;
+  padding: 1.5rem;
   text-align: center;
   backdrop-filter: blur(20px);
   box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.5),
-    0 0 100px rgba(255, 255, 255, 0.1);
+    0 10px 30px rgba(0, 0, 0, 0.5),
+    0 0 50px rgba(255, 255, 255, 0.1);
 }
 
 .game-over-title {
   color: #ff6b6b;
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  text-shadow: 0 0 20px currentColor;
+  font-size: 1.8rem;
+  margin-bottom: 0.8rem;
+  text-shadow: 0 0 15px currentColor;
   animation: titleShake 0.5s ease-in-out;
 }
 
@@ -1409,9 +1444,9 @@ onUnmounted(() => {
 
 .victory-title {
   color: #00ff00;
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  text-shadow: 0 0 20px currentColor;
+  font-size: 1.8rem;
+  margin-bottom: 0.8rem;
+  text-shadow: 0 0 15px currentColor;
   animation: titlePulse 1s ease-in-out infinite;
 }
 
@@ -1423,23 +1458,23 @@ onUnmounted(() => {
 .game-over-message,
 .victory-message {
   color: rgba(255, 255, 255, 0.9);
-  font-size: 1.2rem;
-  margin-bottom: 2rem;
+  font-size: 1rem;
+  margin-bottom: 1rem;
 }
 
 .game-over-stats,
 .victory-stats {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 .stat-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.8rem 1rem;
-  margin-bottom: 0.5rem;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.4rem;
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
+  border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
@@ -1460,19 +1495,19 @@ onUnmounted(() => {
 }
 
 .restart-btn {
-  margin-top: 2rem;
-  padding: 1rem 2rem;
+  margin-top: 1rem;
+  padding: 0.8rem 1.5rem;
   background: linear-gradient(45deg, #00ffff, #0099cc);
   border: none;
-  border-radius: 30px;
+  border-radius: 20px;
   color: #000000;
   font-weight: bold;
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  box-shadow: 0 5px 20px rgba(0, 255, 255, 0.3);
+  letter-spacing: 0.5px;
+  box-shadow: 0 3px 15px rgba(0, 255, 255, 0.3);
 }
 
 .restart-btn:hover {
@@ -1723,15 +1758,28 @@ onUnmounted(() => {
     justify-content: space-between;
   }
 
+  .movement-controls.left-controls {
+    left: 1rem;
+    bottom: 1rem;
+  }
+
+  .fire-controls.right-controls {
+    right: 1rem;
+    bottom: 1rem;
+  }
+
   .game-over-screen,
   .victory-screen,
   .project-card {
-    margin: 1rem;
-    padding: 2rem 1.5rem;
+    margin: 0.5rem;
+    padding: 1rem;
   }
 
-  .project-header h2 {
-    font-size: 1.5rem;
+  .project-header h2,
+  .game-over-title,
+  .victory-title {
+    font-size: 1.4rem;
+    margin-bottom: 0.6rem;
   }
 
   .project-links {
@@ -1758,23 +1806,24 @@ onUnmounted(() => {
   }
 
   .move-btn {
-    width: 45px;
-    height: 45px;
-    font-size: 1rem;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
   }
 
   .fire-btn {
-    width: 70px;
-    height: 40px;
+    width: 45px;
+    height: 45px;
     font-size: 0.8rem;
+    gap: 0.1rem;
   }
 
   .btn-icon {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
   }
 
   .btn-label {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
   }
 }
 </style>
