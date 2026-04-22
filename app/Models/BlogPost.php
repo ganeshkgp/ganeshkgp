@@ -19,6 +19,8 @@ class BlogPost extends Model
         'category',
         'published_at',
         'is_published',
+        'source_url',
+        'author',
     ];
 
     protected function casts(): array

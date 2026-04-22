@@ -1,4 +1,5 @@
 <script setup>
+import { ref, computed } from 'vue';
 import { useSetting } from '@/composables/useSettings.js';
 
 const props = defineProps({
@@ -8,6 +9,11 @@ const props = defineProps({
 const emit = defineEmits(['scroll-to']);
 
 const s = useSetting(props);
+
+const mapOpen = ref(false);
+const mapSrc = computed(() =>
+    `https://maps.google.com/maps?q=${encodeURIComponent(s('contact_address'))}&output=embed&z=14`
+);
 </script>
 
 <template>
@@ -59,9 +65,21 @@ const s = useSetting(props);
                     <div>
                         <h4 class="mb-3 font-semibold text-white">Contact</h4>
                         <ul class="space-y-2 text-gray-500">
-                            <li v-if="s('contact_email')">{{ s('contact_email') }}</li>
-                            <li v-if="s('contact_phone')">{{ s('contact_phone') }}</li>
-                            <li v-if="s('contact_address')">{{ s('contact_address') }}</li>
+                            <li v-if="s('contact_email')">
+                                <a :href="`mailto:${s('contact_email')}`" class="transition-colors hover:text-[#f0a500]">
+                                    {{ s('contact_email') }}
+                                </a>
+                            </li>
+                            <li v-if="s('contact_phone')">
+                                <a :href="`tel:${s('contact_phone')}`" class="transition-colors hover:text-[#f0a500]">
+                                    {{ s('contact_phone') }}
+                                </a>
+                            </li>
+                            <li v-if="s('contact_address')">
+                                <button @click="mapOpen = true" class="text-left transition-colors hover:text-[#f0a500]">
+                                    {{ s('contact_address') }}
+                                </button>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -73,4 +91,42 @@ const s = useSetting(props);
             </div>
         </div>
     </footer>
+
+    <!-- Map popup -->
+    <Teleport to="body">
+        <Transition
+            enter-active-class="transition duration-200 ease-out"
+            enter-from-class="opacity-0"
+            enter-to-class="opacity-100"
+            leave-active-class="transition duration-150 ease-in"
+            leave-from-class="opacity-100"
+            leave-to-class="opacity-0"
+        >
+            <div v-if="mapOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4" @click.self="mapOpen = false">
+                <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+                <div class="relative z-10 w-full max-w-2xl overflow-hidden rounded-xl border border-white/10 shadow-2xl">
+                    <div class="flex items-center justify-between bg-[#111] px-4 py-3">
+                        <div class="flex items-center gap-2 text-sm text-gray-300">
+                            <svg class="h-4 w-4 text-[#f0a500]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                            </svg>
+                            {{ s('contact_address') }}
+                        </div>
+                        <button @click="mapOpen = false" class="text-gray-500 transition-colors hover:text-white">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <iframe
+                        :src="mapSrc"
+                        class="h-80 w-full border-0"
+                        allowfullscreen
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                    ></iframe>
+                </div>
+            </div>
+        </Transition>
+    </Teleport>
 </template>

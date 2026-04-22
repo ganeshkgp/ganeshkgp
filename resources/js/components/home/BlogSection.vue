@@ -1,4 +1,6 @@
 <script setup>
+import { RouterLink } from 'vue-router';
+
 defineProps({
     blogPosts: { type: Array, default: () => [] },
 });
@@ -6,6 +8,7 @@ defineProps({
 const staticBlogPosts = [
     {
         id: 1,
+        slug: null,
         title: 'How Indian Startups Are Winning With Design',
         excerpt: "From Zomato to CRED, great UI/UX has become a key differentiator for India's top tech companies.",
         category: 'Design',
@@ -13,6 +16,7 @@ const staticBlogPosts = [
     },
     {
         id: 2,
+        slug: null,
         title: 'Building Scalable Web Apps For Bharat',
         excerpt: 'Tips and best practices for creating fast, accessible websites optimised for low-bandwidth users across India.',
         category: 'Development',
@@ -20,6 +24,7 @@ const staticBlogPosts = [
     },
     {
         id: 3,
+        slug: null,
         title: 'Visual Branding In The Age Of UPI & Digital India',
         excerpt: "How consistent visual identity helps businesses stand out in India's booming digital payment ecosystem.",
         category: 'Branding',
@@ -44,10 +49,13 @@ function formatDate(dateString) {
             </div>
 
             <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                <article
+                <component
                     v-for="post in blogPosts.length ? blogPosts : staticBlogPosts"
                     :key="post.id"
-                    class="group overflow-hidden rounded-lg border border-white/5 bg-[#1a1a1a] transition-colors hover:border-[#f0a500]/30"
+                    :is="post.slug ? RouterLink : 'div'"
+                    :to="post.slug ? { name: 'blog-detail', params: { slug: post.slug } } : undefined"
+                    class="group overflow-hidden rounded-lg border border-white/5 bg-[#1a1a1a] transition-all hover:border-[#f0a500]/30"
+                    :class="post.slug ? 'hover:-translate-y-1' : ''"
                 >
                     <div class="aspect-video overflow-hidden bg-[#222]">
                         <img v-if="post.image" :src="`/storage/${post.image}`" :alt="post.title" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
@@ -59,14 +67,32 @@ function formatDate(dateString) {
                     </div>
                     <div class="p-5">
                         <div class="mb-2 flex items-center gap-2">
-                            <span v-if="post.category" class="text-xs font-semibold text-[#f0a500]">{{ post.category }}</span>
+                            <span v-if="post.category" class="rounded-full bg-[#f0a500]/10 px-2.5 py-0.5 text-xs font-semibold text-[#f0a500]">{{ post.category }}</span>
                             <span class="text-xs text-gray-600">{{ formatDate(post.published_at) }}</span>
                         </div>
-                        <h3 class="mb-2 text-sm leading-snug font-bold transition-colors group-hover:text-[#f0a500]">{{ post.title }}</h3>
+                        <h3 class="mb-2 text-sm font-bold leading-snug transition-colors group-hover:text-[#f0a500]">{{ post.title }}</h3>
                         <p v-if="post.excerpt" class="line-clamp-2 text-xs leading-relaxed text-gray-500">{{ post.excerpt }}</p>
-                        <a href="#" class="mt-3 inline-block text-xs text-[#f0a500] hover:underline">Read More →</a>
+                        <span class="mt-3 inline-flex items-center gap-1 text-xs text-[#f0a500]">
+                            Read More
+                            <svg class="h-3 w-3 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                            </svg>
+                        </span>
                     </div>
-                </article>
+                </component>
+            </div>
+
+            <!-- View More button -->
+            <div class="mt-12 text-center">
+                <RouterLink
+                    to="/blog"
+                    class="inline-flex items-center gap-2 rounded border border-[#f0a500] px-8 py-3 text-sm font-semibold text-[#f0a500] transition-colors hover:bg-[#f0a500] hover:text-black"
+                >
+                    View All Posts
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                    </svg>
+                </RouterLink>
             </div>
         </div>
     </section>

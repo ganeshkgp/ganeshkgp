@@ -10,6 +10,7 @@ use App\Models\Service;
 use App\Models\Setting;
 use App\Models\Testimonial;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 
 class HomeController extends Controller
 {
@@ -20,7 +21,14 @@ class HomeController extends Controller
 
             'services' => Service::where('is_active', true)
                 ->orderBy('sort_order')
-                ->get(['id', 'title', 'description', 'icon']),
+                ->get(['id', 'title', 'description', 'icon'])
+                ->map(fn (Service $s) => [
+                    'id' => $s->id,
+                    'title' => $s->title,
+                    'description' => $s->description,
+                    'icon' => $s->icon,
+                    'icon_url' => $s->icon ? Storage::url($s->icon) : null,
+                ]),
 
             'portfolioItems' => PortfolioItem::where('is_active', true)
                 ->orderBy('sort_order')

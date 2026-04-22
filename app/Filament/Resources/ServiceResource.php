@@ -4,16 +4,18 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ServiceResource\Pages;
 use App\Models\Service;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -34,9 +36,14 @@ class ServiceResource extends Resource
                 ->required()
                 ->maxLength(255),
 
-            TextInput::make('icon')
-                ->placeholder('e.g. heroicon-o-paint-brush')
-                ->maxLength(255),
+            FileUpload::make('icon')
+                ->label('Icon (SVG file)')
+                ->disk('public')
+                ->directory('icons/services')
+                ->acceptedFileTypes(['image/svg+xml'])
+                ->maxSize(256)
+                ->helperText('Upload an SVG icon file. Max 256 KB.')
+                ->columnSpanFull(),
 
             Textarea::make('description')
                 ->rows(3)
@@ -55,8 +62,12 @@ class ServiceResource extends Resource
     {
         return $table
             ->columns([
+                ImageColumn::make('icon')
+                    ->label('Icon')
+                    ->disk('public')
+                    ->width(32)
+                    ->height(32),
                 TextColumn::make('title')->searchable()->sortable(),
-                TextColumn::make('icon'),
                 IconColumn::make('is_active')->boolean(),
                 TextColumn::make('sort_order')->sortable(),
                 TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
