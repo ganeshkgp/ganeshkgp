@@ -4,10 +4,14 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ContactMessageResource\Pages;
 use App\Models\ContactMessage;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -39,7 +43,37 @@ class ContactMessageResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([]);
+        return $schema->schema([
+            Section::make('Message Details')
+                ->icon('heroicon-o-envelope')
+                ->columns(2)
+                ->schema([
+                    Placeholder::make('name')
+                        ->label('From')
+                        ->content(fn (ContactMessage $record): string => $record->name),
+
+                    Placeholder::make('email')
+                        ->label('Email')
+                        ->content(fn (ContactMessage $record): string => $record->email),
+
+                    Placeholder::make('phone')
+                        ->label('Phone')
+                        ->content(fn (ContactMessage $record): string => $record->phone ?? '—'),
+
+                    Placeholder::make('created_at')
+                        ->label('Received')
+                        ->content(fn (ContactMessage $record): string => $record->created_at->format('d M Y, h:i A')),
+
+                    Placeholder::make('message')
+                        ->label('Message')
+                        ->content(fn (ContactMessage $record): string => $record->message)
+                        ->columnSpanFull(),
+
+                    Toggle::make('is_read')
+                        ->label('Mark as read')
+                        ->columnSpanFull(),
+                ]),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -77,9 +111,15 @@ class ContactMessageResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->actions([
-                \Filament\Actions\Action::make('toggle_read')
+                Action::make('view')
+                    ->label('View')
+                    ->icon('heroicon-o-eye')
+                    ->url(fn (ContactMessage $record): string => static::getUrl('edit', ['record' => $record])),
+
+                Action::make('toggle_read')
                     ->label(fn (ContactMessage $record): string => $record->is_read ? 'Mark Unread' : 'Mark Read')
                     ->icon(fn (ContactMessage $record): string => $record->is_read ? 'heroicon-o-envelope' : 'heroicon-o-check-circle')
+                    ->color(fn (ContactMessage $record): string => $record->is_read ? 'gray' : 'success')
                     ->action(fn (ContactMessage $record) => $record->update(['is_read' => ! $record->is_read])),
 
                 DeleteAction::make(),
@@ -95,6 +135,7 @@ class ContactMessageResource extends Resource
     {
         return [
             'index' => Pages\ListContactMessages::route('/'),
+            'edit'  => Pages\EditContactMessage::route('/{record}/edit'),
         ];
     }
 }
